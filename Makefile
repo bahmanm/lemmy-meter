@@ -24,51 +24,12 @@ export build.dir := $(ROOT)_build/
 
 include bmakelib/bmakelib.mk
 include mk/lemmy-ansible.mk
+include mk/ansible.mk
 
 ####################################################################################################
 
 $(build.dir) :
 	mkdir -p $(@)
-
-####################################################################################################
-
-venv.dir := $(build.dir).venv/
-
-####################################################################################################
-
-define venv.activate
-source $(venv.dir)bin/activate
-endef
-
-####################################################################################################
-
-$(venv.dir) : $(build.dir)
-$(venv.dir) :
-	 [[ ! -d $(@) ]] && python3 -mvenv --prompt 'lemmy-clerk' $(@)
-
-####################################################################################################
-
-$(src.dir)requirements.txt : $(build.dir)
-$(src.dir)requirements.txt :
-	cp $(@) $(<)
-
-####################################################################################################
-
-$(build.dir)requirements.txt : $(src.dir)requirements.txt
-$(build.dir)requirements.txt : $(venv.dir)
-$(build.dir)requirements.txt :
-	$(venv.activate) \
-	&& pip install --upgrade -r $(@)
-
-####################################################################################################
-
-.PHONY : ansible.docker
-
-ansible.docker : $(build.dir)requirements.txt
-ansible.docker :
-	$(venv.activate) \
-	&& { ansible-galaxy collection list | grep community.docker; } \
-	|| ansible-galaxy collection install community.docker
 
 ####################################################################################################
 
