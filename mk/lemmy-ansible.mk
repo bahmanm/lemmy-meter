@@ -15,6 +15,24 @@
 ####################################################################################################
 
 ####################################################################################################
+# This Makefile contains all that is required to configure the playbook used to install Lemmy.
+#
+# It, essentially, grabs a copy of "lemmy-ansible" repo and sets the values of relevant variables
+# use by the playbook.
+#
+# 👉 The only target that you'd need to use this is `lemmy-ansible`, as the others are supposed to
+#    be private.
+####################################################################################################
+
+####################################################################################################
+
+.PHONY : ensure-variables
+
+ensure-variables : bmakelib.error-if-blank( ROOT )
+ensure-variables : bmakelib.error-if-blank( src.dir )
+ensure-variables : bmakelib.error-if-blank( build.dir )
+
+####################################################################################################
 
 .PHONY : openssl
 
@@ -69,4 +87,5 @@ lemmy-ansible.config-files :
 .PHONY : lemmy-ansible
 
 lemmy-ansible : $(info Preparing lemmy-ansible playbook...)
+lemmy-ansible : ensure-variables
 lemmy-ansible : lemmy-ansible.config-files
