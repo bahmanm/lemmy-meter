@@ -22,8 +22,11 @@ export NAME := lemmy-meter
 export ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 export src.dir := $(ROOT)
 export build.dir := $(ROOT)_build/
+export DEPLOY_ROOT ?= $(build.dir)data/
 
 include bmakelib/bmakelib.mk
+include mk/lemmy-docker.mk
+include mk/lemmy-meter.mk
 
 ####################################################################################################
 
@@ -41,93 +44,8 @@ $(build.dir) :
 
 ####################################################################################################
 
-lemmy-docker.dir := $(build.dir)lemmy-docker/
-lemmy-docker.github-url := https://api.github.com/repos/LemmyNet/lemmy/releases/latest
-lemmy-docker.original-docker-compose.yml := $(lemmy-docker.dir)docker-compose.yml
-lemmy-docker.docker-compose.yml := $(lemmy-docker.dir)$(NAME)-docker-compose.yml
-
-####################################################################################################
-
-$(lemmy-docker.dir) : | $(build.dir)
-$(lemmy-docker.dir) :
-	curl \
-		--location \
-		--progress-bar \
-		-H 'Accept: application/vnd.github+json' \
-		-o - \
-		$(lemmy-docker.tarball-url) \
-	| tar \
-		-C $(build.dir) \
-		--wildcards \
-		--strip-components=1 \
-		--extract \
-		--gzip \
-		--file - \
-		--transform='s/docker/lemmy-docker/' \
-		LemmyNet-lemmy-*/docker
-
-####################################################################################################
-
-.PHONY : lemmy-docker.docker-compose
-
-$(lemmy-docker.docker-compose.yml) : | $(lemmy-docker.dir)
-$(lemmy-docker.docker-compose.yml) : $(lemmy-docker.original-docker-compose.yml)
-$(lemmy-docker.docker-compose.yml) : yq
-$(lemmy-docker.docker-compose.yml) :
-	cat $(<) \
-	| yq 'del(.services.lemmy.build)' \
-	| yq '. | (.services.lemmy.image = "dessalines/lemmy:$(lemmy-docker.tag-name)")' > \
-		$(lemmy-docker.docker-compose.yml)
-
-####################################################################################################
-
-
-.PHONY : lemmy-docker.prepare
-
-lemmy-docker.prepare : lemmy-docker.tag-name := $(shell curl --silent -XGET $(lemmy-docker.github-url) | jq -r '.tag_name')
-lemmy-docker.prepare : lemmy-docker.tarball-url := $(shell curl --silent -XGET $(lemmy-docker.github-url) | jq -r '.tarball_url')
-lemmy-docker.prepare : | $(lemmy-docker.dir)
-lemmy-docker.prepare : $(lemmy-docker.docker-compose.yml)
-
-####################################################################################################
-
-.PHONY : lemmy-docker.volumes
-
-lemmy-docker.volumes : | $(lemmy-docker.dir)
-	mkdir -p $(lemmy-docker.dir)volumes/pictrs \
-	&& sudo chown -R 991:991 $(lemmy-docker.dir)volumes/pictrs
-
-####################################################################################################
-
-.PHONY : lemmy-docker.up
-
-lemmy-docker.up : bmakelib.default-if-blank( lemmy-docker.project-name,lemmy-docker )
-lemmy-docker.up : lemmy-docker.prepare
-lemmy-docker.up : lemmy-docker.volumes
-lemmy-docker.up :
-	docker-compose \
-		--ansi never \
-		--file $(lemmy-docker.docker-compose.yml) \
-		--project-name $(lemmy-docker.project-name) \
-		up \
-		--detach \
-		--remove-orphans \
-		--wait \
-		--wait-timeout 120
-
-####################################################################################################
-
-.PHONY : lemmy-docker.down
-
-lemmy-docker.down : bmakelib.default-if-blank( lemmy-docker.project-name,lemmy-docker )
-lemmy-docker.down : lemmy-docker.prepare
-lemmy-docker.down :
-	docker-compose \
-		--ansi never \
-		--file $(lemmy-docker.docker-compose.yml) \
-		--project-name $(lemmy-docker.project-name) \
-		down \
-		--remove-orphans
+$(DEPLOY_ROOT) :
+	mkdir -p $(DEPLOY_ROOT)
 
 ####################################################################################################
 
@@ -136,9 +54,16 @@ lemmy-docker.down :
 clean :
 	-sudo rm -rf $(build.dir)
 
-
 ####################################################################################################
 
 .PHONY : all
 
 all : lemmy-docker.prepare
+
+
+####################################################################################################
+
+.PHONY : TAGS
+
+TAGS :
+	universal-ctags -e -a -f $(ROOT)TAGS --language-force=make Makefile mk/*.mk
