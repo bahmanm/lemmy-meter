@@ -16,6 +16,8 @@
 
 lemmy-docker..checkout-dir := $(build.dir)lemmy-docker/
 lemmy-docker..github-url := https://api.github.com/repos/LemmyNet/lemmy/releases/latest
+lemmy-docker..tarball-url = $(shell curl --silent -XGET $(lemmy-docker..github-url) | jq -r '.tarball_url')
+lemmy-docker..tag-name = $(shell curl --silent -XGET $(lemmy-docker..github-url) | jq -r '.tag_name')
 lemmy-docker..deploy-root = $(DEPLOY_ROOT)lemmy/
 lemmy-docker..original-docker-compose.yml := $(lemmy-docker..checkout-dir)docker-compose.yml
 lemmy-docker..docker-compose.yml = $(lemmy-docker..deploy-root)docker-compose.yml
@@ -43,6 +45,7 @@ $(lemmy-docker..checkout-dir) :
 ####################################################################################################
 
 $(lemmy-docker..docker-compose.yml) : | $(lemmy-docker..checkout-dir)
+$(lemmy-docker..docker-compose.yml) : | $(lemmy-docker..deploy-root)
 $(lemmy-docker..docker-compose.yml) : $(lemmy-docker..original-docker-compose.yml)
 $(lemmy-docker..docker-compose.yml) : yq
 $(lemmy-docker..docker-compose.yml) :
@@ -56,8 +59,6 @@ $(lemmy-docker..docker-compose.yml) :
 
 .PHONY : lemmy-docker..prepare
 
-lemmy-docker..prepare : lemmy-docker..tag-name := $(shell curl --silent -XGET $(lemmy-docker..github-url) | jq -r '.tag_name')
-lemmy-docker..prepare : lemmy-docker..tarball-url := $(shell curl --silent -XGET $(lemmy-docker..github-url) | jq -r '.tarball_url')
 lemmy-docker..prepare : | $(lemmy-docker..checkout-dir)
 lemmy-docker..prepare : $(lemmy-docker..docker-compose.yml)
 
@@ -73,8 +74,9 @@ $(lemmy-docker..deploy-root) : | $(DEPLOY_ROOT)
 
 lemmy-docker..volumes : | $(lemmy-docker..deploy-root)
 lemmy-docker..volumes :
-	mkdir -p $(lemmy-docker..deploy-root)volumes/pictrs \
-	&& sudo chown -R 991:991 $(lemmy-docker..deploy-root)volums/pictrs \
+	mkdir -p $(lemmy-docker..deploy-root)volumes/postgres \
+	&& mkdir -p $(lemmy-docker..deploy-root)volumes/pictrs \
+	&& sudo chown -R 991:991 $(lemmy-docker..deploy-root)volumes/pictrs \
 	&& cp \
 		$(lemmy-docker..checkout-dir)lemmy.hjson \
 		$(lemmy-docker..checkout-dir)nginx.conf \
@@ -87,12 +89,13 @@ lemmy-docker..volumes :
 lemmy-docker.up : lemmy-docker..ensure-variables
 lemmy-docker.up : bmakelib.default-if-blank( lemmy-docker.project-name,lemmy-docker )
 lemmy-docker.up : lemmy-docker..prepare
+lemmy-docker.up : lemmy-docker..volumes
 lemmy-docker.up :
 	docker-compose \
 		--ansi never \
 		--file $(lemmy-docker..docker-compose.yml) \
 		--project-name $(lemmy-docker.project-name) \
-		--project-directory $(lemmy-docker..deploy-root)
+		--project-directory $(lemmy-docker..deploy-root) \
 		up \
 		--detach \
 		--remove-orphans \
