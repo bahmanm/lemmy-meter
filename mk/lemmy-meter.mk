@@ -42,6 +42,7 @@ lemmy-meter..volumes : | $(lemmy-meter..deploy-root)
 	&& cp \
 		$(src.dir)config/blackbox_exporter-config.yml \
 		$(src.dir)config/prometheus-config.yml \
+		$(src.dir)config/grafana-config.ini \
 		$(lemmy-meter..deploy-root)
 
 
