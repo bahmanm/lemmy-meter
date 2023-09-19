@@ -25,17 +25,7 @@ export build.dir := $(ROOT)_build/
 export DEPLOY_ROOT ?= $(build.dir)data/
 
 include bmakelib/bmakelib.mk
-include mk/lemmy-docker.mk
 include mk/lemmy-meter.mk
-
-####################################################################################################
-
-.PHONY : yq
-
-yq :
-	$$(hash yq 2>/dev/null)  \
-	|| { echo "Cannot find 'yq'.  Perhaps the package is not installed?"; \
-		false; }
 
 ####################################################################################################
 
@@ -49,21 +39,21 @@ $(DEPLOY_ROOT) : | $(build.dir)
 
 ####################################################################################################
 
+TAGS : $(src.dir)Makefile
+TAGS : $(src.dir)mk/*.mk
+TAGS :
+	universal-ctags -e -a -f $(ROOT)TAGS --language-force=make Makefile mk/*.mk
+
+
+####################################################################################################
+
 .PHONY : clean
 
 clean :
-	-sudo rm -rf $(build.dir)
+	-rm -rf $(build.dir)
 
 ####################################################################################################
 
 .PHONY : all
 
-all : lemmy-docker.prepare
-
-
-####################################################################################################
-
-.PHONY : TAGS
-
-TAGS :
-	universal-ctags -e -a -f $(ROOT)TAGS --language-force=make Makefile mk/*.mk
+all : lemmy-meter.up
