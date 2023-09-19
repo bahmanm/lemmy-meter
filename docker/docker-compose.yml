@@ -1,0 +1,46 @@
+####################################################################################################
+# Copyright (c) 2023 Bahman Movaqar
+#
+# This file is part of lemmy-meter.
+# lemmy-meter is free software: you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# lemmy-meter is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with lemmy-meter.
+# If not, see <https://www.gnu.org/licenses/>.
+####################################################################################################
+
+version: '3.8'
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    volumes:
+      - ./prometheus-config.yml:/etc/prometheus/prometheus.yml
+      - ./volumes/prometheus:/prometheus
+    ports:
+      - '9090:9090'
+    user: '${UID}:${GID}'
+    restart: always
+
+  grafana:
+    image: grafana/grafana:9.4.14
+    volumes:
+      - ./volumes/grafana:/var/lib/grafana
+    ports:
+      - '3000:3000'
+    user: '${UID}:${GID}'
+    restart: always
+
+  blackbox_exporter:
+    image: prom/blackbox-exporter:v0.24.0
+    volumes:
+      - ./blackbox_exporter-config.yml:/etc/blackbox_exporter/config.yml
+    ports:
+      - '9115:9115'
+    user: '${UID}:${GID}'
+    restart: always
