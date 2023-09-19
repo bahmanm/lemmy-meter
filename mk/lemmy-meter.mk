@@ -37,7 +37,12 @@ $(lemmy-meter..deploy-root) :
 .PHONY : lemmy-meter..volumes
 
 lemmy-meter..volumes : | $(lemmy-meter..deploy-root)
-	mkdir -p $(lemmy-meter..deploy-root)volumes/prometheus
+	mkdir -p $(lemmy-meter..deploy-root)volumes/prometheus \
+	mkdir -p $(lemmy-meter..deploy-root)volumes/grafana \
+	&& cp \
+		$(src.dir)config/blackbox_exporter-config.yml \
+		$(src.dir)config/prometheus-config.yml \
+		$(lemmy-meter..deploy-root)
 
 
 ####################################################################################################
@@ -58,7 +63,7 @@ lemmy-meter.up : lemmy-meter..volumes
 lemmy-meter.up :
 	export UID \
 	&& export GID=$$(id -g) \
-	&& docker-compose \
+	&& docker compose \
 		--ansi never \
 		--file $(lemmy-meter..docker-compose.yml) \
 		--project-name $(lemmy-meter.project-name) \
@@ -77,9 +82,31 @@ lemmy-meter.down : lemmy-meter..ensure-variables
 lemmy-meter.down : bmakelib.default-if-blank( lemmy-meter.project-name,lemmy-meter )
 lemmy-meter.down : | $(lemmy-meter..docker-compose.yml)
 lemmy-meter.down :
-	docker-compose \
+	export UID \
+	&& export GID=$$(id -g) \
+	&& docker compose \
 		--ansi never \
 		--file $(lemmy-meter..docker-compose.yml) \
 		--project-name $(lemmy-meter.project-name) \
+		--project-directory $(lemmy-meter..deploy-root) \
 		down \
 		--remove-orphans
+
+
+####################################################################################################
+
+.PHONY : lemmy-meter.restart-%
+
+lemmy-meter.restart-% : lemmy-meter..ensure-variables
+lemmy-meter.restart-% : lemmy-meter..volumes
+lemmy-meter.restart-% : | $(lemmy-meter..docker-compose.yml)
+lemmy-meter.restart-% : bmakelib.default-if-blank( lemmy-meter.project-name,lemmy-meter )
+	export UID \
+	&& export GID=$$(id -g) \
+	&& docker compose \
+		--ansi never \
+		--file $(lemmy-meter..docker-compose.yml) \
+		--project-name $(lemmy-meter.project-name) \
+		--project-directory $(lemmy-meter..deploy-root) \
+		restart \
+		$(*)
