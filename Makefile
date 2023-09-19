@@ -16,7 +16,7 @@
 
 SHELL := /usr/bin/env -S bash -o pipefail
 
-.DEFAULT_GOAL := all
+.DEFAULT_GOAL := up
 
 export NAME := lemmy-meter
 export ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
@@ -54,6 +54,12 @@ clean :
 
 ####################################################################################################
 
-.PHONY : all
+.PHONY : up
 
-all : lemmy-meter.up
+up : lemmy-meter.up
+
+####################################################################################################
+
+.PHONY : down
+
+down : lemmy-meter.down
