@@ -12,7 +12,7 @@ lemmy-meter provides 3 levels of reports.
 
 This is what you are, almost always, interested in.  
 
-![](images/lemmy-meter-overall-health.png)
+![](https://github.com/bahmanm/lemmy-meter/blob/main/doc/images/lemmy-meter-overall-health.png?raw=true)
 
 A single gauge which tells you if your instance is
 
@@ -36,7 +36,7 @@ A breakdown of [overall health](#21-overall-health) by few, subjectively, import
   - getComments
   - getCmmunities
 
-![](images/lemmy-meter-endpoint-health.png)
+![](https://github.com/bahmanm/lemmy-meter/blob/main/doc/images/lemmy-meter-endpoint-health.png?raw=true)
 
 ## 2.3 Endpoint Response Time Rates
 
@@ -44,7 +44,7 @@ A visual representation of the fluctuations in endpoint response times over a 5 
 In simple terms, the graph shows how much the average response has changed over time.  Not that
 it does not represent the actual response times but only the fluctuations.
 
-![](images/lemmy-meter-response-time-rates.png)
+![](https://github.com/bahmanm/lemmy-meter/blob/main/doc/images/lemmy-meter-response-time-rates.png?raw=true)
 
 # 3. How To Run
 
