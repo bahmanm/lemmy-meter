@@ -34,17 +34,21 @@ A breakdown of [overall health](#health-reports) by few, subjectively, important
   - getComments
   - getCmmunities
   
+<img src="images/lemmy-meter-endpoint-health.png" />
+  
 ## 1.3 Endpoint Response Time Rates
 
 A visual representation of the fluctuations in endpoint response times over a 5 minute rolling window.  
 In simple terms, the graph shows how much the average response has changed over time.  Not that
 it does not represent the actual response times but only the fluctuations.
 
-## How To Run
+<img src="images/lemmy-meter-response-time-rates.png" />
+
+# 2. How To Run
 
 *The only dependency is [bmakelib](https://github.com/bahmanm/bmakelib).*
 
-### Launch 
+## 2.1 Launch 
 
 Simply run
 
@@ -54,7 +58,7 @@ $ make up
 
 and then access Grafana at http://localhost:3000 *(admin/admin)*
 
-### Shutdown
+## 2.2 Shutdown
 
 Simply run
 
