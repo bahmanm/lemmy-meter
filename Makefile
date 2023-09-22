@@ -34,14 +34,13 @@ $(build.dir) :
 
 ####################################################################################################
 
-$(DEPLOY_ROOT) : | $(build.dir)
+$(DEPLOY_ROOT) : 	| $(build.dir)
 	mkdir -p $(@)
 
 ####################################################################################################
 
-TAGS : $(src.dir)Makefile
-TAGS : $(src.dir)mk/*.mk
-TAGS :
+TAGS :		$(src.dir)Makefile \
+		$(src.dir)mk/*.mk
 	universal-ctags -e -a -f $(ROOT)TAGS --language-force=make Makefile mk/*.mk
 
 
@@ -56,10 +55,10 @@ clean :
 
 .PHONY : up
 
-up : lemmy-meter.up
+up :		lemmy-meter.up
 
 ####################################################################################################
 
 .PHONY : down
 
-down : lemmy-meter.down
+down :		lemmy-meter.down

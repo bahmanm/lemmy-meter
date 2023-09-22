@@ -15,7 +15,6 @@
 ####################################################################################################
 
 ---
-
 ####################################################################################################
 # general
 ####################################################################################################
@@ -28,34 +27,26 @@ global:
 ####################################################################################################
 
 scrape_configs:
-
   ##################################################################################################
   # api_getPosts
 
   - job_name: api_getPosts
     scrape_interval: 20s
     metrics_path: /probe
-    params:
-      module: &http_api_modules
-        - http_api_2xx
-        - http_api_4xx
-        - http_api_5xx
-    static_configs:
-      - targets: &lemmy_instances
-        - enterprise.lemmy.ml
-        - ds9.lemmy.ml
-        - voyager.lemmy.ml
+    file_sd_configs:
+      - refresh_interval: 1m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_api_*.yml
     relabel_configs:
       - source_labels: [__address__]
         target_label: lemmy_instance
-        replacement: $1
       - source_labels: [__address__]
         target_label: __param_target
         replacement: https://$1/api/v3/post/list?limit=1
       - target_label: __address__
         replacement: blackbox_exporter:9115
-      - source_labels: [__param_module]
-        target_label: probe
+      - source_labels: [probe]
+        target_label: __param_module
 
   ##################################################################################################
   # api_getComments
@@ -63,10 +54,10 @@ scrape_configs:
   - job_name: api_getComments
     scrape_interval: 20s
     metrics_path: /probe
-    params:
-      module: *http_api_modules
-    static_configs:
-      - targets: *lemmy_instances
+    file_sd_configs:
+      - refresh_interval: 1m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_api_*.yml
     relabel_configs:
       - source_labels: [__address__]
         target_label: lemmy_instance
@@ -76,9 +67,8 @@ scrape_configs:
         replacement: https://$1/api/v3/comment/list?limit=1
       - target_label: __address__
         replacement: blackbox_exporter:9115
-      - source_labels: [__param_module]
-        target_label: probe
-
+      - source_labels: [probe]
+        target_label: __param_module
 
   ##################################################################################################
   # api_getCommunities
@@ -86,10 +76,10 @@ scrape_configs:
   - job_name: api_getCommunities
     scrape_interval: 20s
     metrics_path: /probe
-    params:
-      module: *http_api_modules
-    static_configs:
-      - targets: *lemmy_instances
+    file_sd_configs:
+      - refresh_interval: 1m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_api_*.yml
     relabel_configs:
       - source_labels: [__address__]
         target_label: lemmy_instance
@@ -99,9 +89,8 @@ scrape_configs:
         replacement: https://$1/api/v3/community/list?limit=1
       - target_label: __address__
         replacement: blackbox_exporter:9115
-      - source_labels: [__param_module]
-        target_label: probe
-
+      - source_labels: [probe]
+        target_label: __param_module
 
   ##################################################################################################
   # webpage_landing_page
@@ -109,13 +98,10 @@ scrape_configs:
   - job_name: webpage_landing_page
     scrape_interval: 30s
     metrics_path: /probe
-    params:
-      module:
-        - http_page_2xx
-        - http_page_4xx
-        - http_page_5xx
-    static_configs:
-      - targets: *lemmy_instances
+    file_sd_configs:
+      - refresh_interval: 1m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_page_*.yml
     relabel_configs:
       - source_labels: [__address__]
         target_label: lemmy_instance
@@ -125,8 +111,8 @@ scrape_configs:
         replacement: https://$1/
       - target_label: __address__
         replacement: blackbox_exporter:9115
-      - source_labels: [__param_module]
-        target_label: probe
+      - source_labels: [probe]
+        target_label: __param_module
 
   ##################################################################################################
   # blackbox_exporter
@@ -135,4 +121,4 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets:
-        - blackbox_exporter:9115
+          - blackbox_exporter:9115

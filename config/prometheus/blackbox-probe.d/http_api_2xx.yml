@@ -15,34 +15,18 @@
 ####################################################################################################
 
 ---
-version: "3.8"
-
-services:
-  prometheus:
-    image: prom/prometheus:v2.47.0
-    volumes:
-      - ./prometheus-config:/etc/prometheus
-      - ./volumes/prometheus:/prometheus
-    ports:
-      - "9090:9090"
-    user: "${UID}:${GID}"
-    restart: "no"
-
-  grafana:
-    image: grafana/grafana:9.4.14
-    volumes:
-      - ./grafana-config.ini:/etc/grafana/grafana.ini
-      - ./volumes/grafana:/var/lib/grafana
-    ports:
-      - "3000:3000"
-    user: "${UID}:${GID}"
-    restart: always
-
-  blackbox_exporter:
-    image: prom/blackbox-exporter:v0.24.0
-    volumes:
-      - ./blackbox_exporter-config.yml:/etc/blackbox_exporter/config.yml
-    ports:
-      - "9115:9115"
-    user: "${UID}:${GID}"
-    restart: always
+- labels:
+    probe: http_api_2xx
+  targets:
+    - lemmy.ml
+    - lemmy.world
+    - lemm.ee
+    - lemmy.ca
+    - programming.dev
+    - sopuli.xyz
+    - sh.itjust.works
+    - beehaw.org
+    - hexbear.net
+    - lemmy.blahaj.zone
+    - discuss.tchncs.de
+    - lemmy.sdf.org
