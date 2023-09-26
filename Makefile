@@ -48,6 +48,7 @@ TAGS :		$(src.dir)Makefile \
 
 .PHONY : clean
 
+clean :		lemmy-meter.grafana-db.backup
 clean :
 	-rm -rf $(build.dir)
 
@@ -62,3 +63,5 @@ up :		lemmy-meter.up
 .PHONY : down
 
 down :		lemmy-meter.down
+
+####################################################################################################
