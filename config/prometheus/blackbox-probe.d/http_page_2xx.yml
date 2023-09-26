@@ -18,15 +18,6 @@
 - labels:
     probe: http_page_2xx
   targets:
-    - lemmy.ml
-    - lemmy.world
-    - lemm.ee
-    - lemmy.ca
-    - programming.dev
-    - sopuli.xyz
-    - sh.itjust.works
-    - beehaw.org
-    - hexbear.net
-    - lemmy.blahaj.zone
-    - discuss.tchncs.de
-    - lemmy.sdf.org
+    - ds9.lemmy.ml
+    - enterprise.lemmy.ml
+    - voyager.lemmy.ml
