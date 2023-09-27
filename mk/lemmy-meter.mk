@@ -138,3 +138,28 @@ lemmy-meter.grafana-db.backup :		$(lemmy-meter..grafana.db.backup)
 
 $(lemmy-meter..grafana.db.backup) : $(lemmy-meter..grafana.db)
 	-cp $(<) $(@)
+
+
+####################################################################################################
+
+grafana..configure :	\
+		bmakelib.default-if-blank( admin-password,admin ) \
+		bmakelib.default-if-blank( lemmy-meter.project-name,lemmy-meter )
+	export UID \
+	&& export GID=$$(id -g) \
+	&& cd $(lemmy-meter..deploy-root) \
+	&& docker compose exec \
+		--detach \
+		grafana \
+		grafana-cli \
+			plugins \
+			install \
+			marcusolsson-csv-datasource
+	&& docker compose exec \
+		--detach \
+		grafana \
+		grafana-cli \
+			--homepath '/var/lib/grafana' \
+			admin \
+			reset-admin-password \
+			$(admin-password)
