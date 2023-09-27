@@ -71,7 +71,8 @@ $(lemmy-meter..docker-compose.yml) : $(lemmy-meter..src-docker-compose.yml) \
 
 .PHONY : lemmy-meter.up
 
-lemmy-meter.up : lemmy-meter..ensure-variables \
+lemmy-meter.up : \
+		lemmy-meter..ensure-variables \
 		bmakelib.default-if-blank( lemmy-meter.project-name,lemmy-meter ) \
 		$(lemmy-meter..docker-compose.yml) \
 		lemmy-meter..volumes \
@@ -142,7 +143,9 @@ $(lemmy-meter..grafana.db.backup) : $(lemmy-meter..grafana.db)
 
 ####################################################################################################
 
-grafana..configure :	\
+.PHONY : grafana.configure
+
+grafana.configure : \
 		bmakelib.default-if-blank( admin-password,admin ) \
 		bmakelib.default-if-blank( lemmy-meter.project-name,lemmy-meter )
 	export UID \
@@ -154,7 +157,7 @@ grafana..configure :	\
 		grafana-cli \
 			plugins \
 			install \
-			marcusolsson-csv-datasource
+			marcusolsson-csv-datasource \
 	&& docker compose exec \
 		--detach \
 		grafana \
