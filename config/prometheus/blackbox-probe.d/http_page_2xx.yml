@@ -20,4 +20,5 @@
   targets:
     - ds9.lemmy.ml
     - enterprise.lemmy.ml
+    - lemmy.myserv.one
     - voyager.lemmy.ml
