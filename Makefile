@@ -26,6 +26,7 @@ export DEPLOY_ROOT ?= $(build.dir)data/
 
 include bmakelib/bmakelib.mk
 include mk/lemmy-meter.mk
+include mk/ansible.mk
 
 ####################################################################################################
 
@@ -48,7 +49,6 @@ TAGS :		$(src.dir)Makefile \
 
 .PHONY : clean
 
-clean :		lemmy-meter.grafana-db.backup
 clean :
 	-rm -rf $(build.dir)
 
@@ -67,3 +67,13 @@ up : \
 down :		lemmy-meter.down
 
 ####################################################################################################
+
+.PHONY : package
+
+package : $(build.dir)lemmy-meter.tar.gz
+
+####################################################################################################
+
+.PHONY : deploy
+
+deploy : $(ansible.playbook.deploy-remote)
