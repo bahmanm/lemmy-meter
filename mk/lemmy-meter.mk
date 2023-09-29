@@ -14,14 +14,18 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
+lemmy-meter.archive = $(build.dir)lemmy-meter.tar.gz
+
+####################################################################################################
+
 lemmy-meter..deploy-root = $(DEPLOY_ROOT)lemmy-meter/
 lemmy-meter..src-docker-compose.yml := $(ROOT)docker/docker-compose.yml
 lemmy-meter..docker-compose.yml = $(lemmy-meter..deploy-root)docker-compose.yml
 
 lemmy-meter..ts = $(shell date '+%Y%m%d-%H%M%S')
 
-lemmy-meter..grafana-volume := $(lemmy-meter..deploy-root)volumes/grafana
-lemmy-meter..src-grafana.db := $(ROOT)config/grafana.db
+lemmy-meter..grafana-volume = $(lemmy-meter..deploy-root)volumes/grafana
+lemmy-meter..src-grafana.db = $(ROOT)config/grafana.db
 lemmy-meter..grafana.db = $(lemmy-meter..deploy-root)volumes/grafana/grafana.db
 lemmy-meter..grafana.db.backup = $(lemmy-meter..src-grafana.db).$(lemmy-meter..ts).backup
 
@@ -35,20 +39,19 @@ lemmy-meter..ensure-variables : bmakelib.error-if-blank( DEPLOY_ROOT )
 
 ####################################################################################################
 
-$(lemmy-meter..deploy-root) :	| $(DEPLOY_ROOT)
-	mkdir -p $(lemmy-meter..deploy-root)
+$(lemmy-meter..deploy-root) : | $(DEPLOY_ROOT)
+	mkdir -p $(@)
 
 ####################################################################################################
 
-$(lemmy-meter..grafana.db) :	$(lemmy-meter..src-grafana.db) \
-		| $(lemmy-meter..grafana-volume)
-	cp $(<) $(@)
+$(lemmy-meter..grafana.db) : $(lemmy-meter..src-grafana.db)
+	-cp $(<) $(@)
 
 ####################################################################################################
 
 .PHONY : lemmy-meter..volumes
 
-lemmy-meter..volumes :	| $(lemmy-meter..deploy-root)
+lemmy-meter..volumes : | $(lemmy-meter..deploy-root)
 	cp \
 		$(src.dir)config/blackbox_exporter-config.yml \
 		$(src.dir)config/grafana-config.ini \
@@ -63,8 +66,9 @@ lemmy-meter..volumes :	| $(lemmy-meter..deploy-root)
 
 ####################################################################################################
 
-$(lemmy-meter..docker-compose.yml) : $(lemmy-meter..src-docker-compose.yml) \
-					| $(lemmy-meter..deploy-root)
+$(lemmy-meter..docker-compose.yml) : \
+		$(lemmy-meter..src-docker-compose.yml) \
+		| $(lemmy-meter..deploy-root)
 	cp $(<) $(@)
 
 ####################################################################################################
@@ -95,7 +99,8 @@ lemmy-meter.up : \
 
 .PHONY : lemmy-meter.down
 
-lemmy-meter.down : lemmy-meter..ensure-variables \
+lemmy-meter.down : \
+		lemmy-meter..ensure-variables \
 		bmakelib.default-if-blank( lemmy-meter.project-name,lemmy-meter ) \
 		| $(lemmy-meter..docker-compose.yml)
 	export UID \
@@ -113,7 +118,8 @@ lemmy-meter.down : lemmy-meter..ensure-variables \
 
 .PHONY : lemmy-meter.restart-%
 
-lemmy-meter.restart-% : lemmy-meter..ensure-variables \
+lemmy-meter.restart-% : \
+		lemmy-meter..ensure-variables \
 		lemmy-meter..volumes \
 		$(lemmy-meter..grafana.db) \
 		$(lemmy-meter..docker-compose.yml) \
@@ -133,7 +139,7 @@ lemmy-meter.restart-% : lemmy-meter..ensure-variables \
 
 .PHONY : lemmy-meter.grafana-db.backup
 
-lemmy-meter.grafana-db.backup :		$(lemmy-meter..grafana.db.backup)
+lemmy-meter.grafana-db.backup : $(lemmy-meter..grafana.db.backup)
 
 ####################################################################################################
 
@@ -166,3 +172,17 @@ grafana.configure : \
 			admin \
 			reset-admin-password \
 			$(admin-password)
+
+####################################################################################################
+
+$(lemmy-meter.archive) : | $(build.dir)
+	tar \
+		-C $(ROOT) \
+		--create \
+		--gzip \
+		--file $(@) \
+		--transform 's#^#lemmy-meter/#' \
+		config \
+		docker \
+		mk \
+		Makefile
