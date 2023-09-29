@@ -66,4 +66,4 @@ You can access Grafana at http://localhost:3000 *(admin/admin)*
 
 ## 3.2 Remote
 
-Run `make deploy` to, well, deploy the lemmy-meter to the remote server.
+Run `make deploy` to, well, deploy lemmy-meter to the remote server.
