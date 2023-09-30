@@ -15,6 +15,9 @@
 ####################################################################################################
 
 ansible.root := $(ROOT)ansible/
+ansible.venv := $(build.dir)ansible-venv/
+ansible.requirements := $(ansible.root)requirements.txt
+ansible.venv.activate := source $(ansible.venv)bin/activate
 
 ####################################################################################################
 
@@ -22,10 +25,21 @@ ansible.playbook.deploy-remote := $(ansible.root)playbooks/deploy-remote.yml
 
 ####################################################################################################
 
+$(ansible.venv) :
+	python3 -mvenv --prompt 'ansible' $(@) \
+	&& source $(@)/bin/activate \
+	&& pip install --upgrade pip \
+	&& pip install -r $(ansible.requirements)
+
+####################################################################################################
+
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.lemmy-meter-server,localhost )
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.verbosity,-v )
-$(ansible.playbook.deploy-remote) : $(lemmy-meter.archive)
-	ansible-playbook \
+$(ansible.playbook.deploy-remote) : \
+		$(lemmy-meter.archive)
+		| $(ansible.venv)
+	$(ansible.venv.activate) \
+	&& ansible-playbook \
 		$(ansible.verbosity) \
 		-i '$(ansible.lemmy-meter-server),' \
 		-e 'ansible_user=lemmy-meter' \
@@ -33,3 +47,12 @@ $(ansible.playbook.deploy-remote) : $(lemmy-meter.archive)
 		-e 'lemmy_meter_server_app_root=/home/lemmy-meter/app' \
 		-e 'lemmy_meter_server_deploy_root=/home/lemmy-meter/var' \
 		$(@)
+
+####################################################################################################
+
+.PHONY : ansible.playbook.deploy-remote.test
+
+ansible.playbook.deploy-remote.test : | $(ansible.venv)
+	$(ansible.venv.activate) \
+	&& cd $(ROOT)ansible/tests \
+	&& molecule test --scenario-name deploy_remote
