@@ -27,6 +27,7 @@ export DEPLOY_ROOT ?= $(build.dir)data/
 include bmakelib/bmakelib.mk
 include mk/lemmy-meter.mk
 include mk/ansible.mk
+include mk/target-instances.mk
 
 ####################################################################################################
 
