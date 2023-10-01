@@ -14,13 +14,6 @@
         state: directory
       register: _tempdir
 
-    - name: Extract the archive
-      ansible.builtin.unarchive:
-        src: '{{ lemmy_meter_archive_path }}'
-        dest: '{{ _tempdir.path }}'
-      register: _result
-      changed_when: _result is success
-
     - name: Check if installation already exists
       ansible.builtin.stat:
         path: '{{ lemmy_meter_server_app_root }}/Makefile'
@@ -46,13 +39,13 @@
       register: _result
       changed_when: _result is success
 
-    - name: Copy the new lemmy-meter version to the app directory
-      ansible.builtin.copy:
-        src: '{{ _tempdir.path }}/lemmy-meter/'
+    - name: Extract the archive
+      ansible.builtin.unarchive:
+        src: '{{ lemmy_meter_archive_path }}'
         dest: '{{ lemmy_meter_server_app_root }}'
-        force: true
-        backup: true
-        remote_src: true
+        extra_opts:
+          - --transform
+          - "s#^lemmy-meter##"
       register: _result
       changed_when: _result is success
 
