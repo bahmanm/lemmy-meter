@@ -41,7 +41,8 @@ $(DEPLOY_ROOT) : 	| $(build.dir)
 
 ####################################################################################################
 
-TAGS :		$(src.dir)Makefile \
+TAGS : \
+		$(src.dir)Makefile \
 		$(src.dir)mk/*.mk
 	universal-ctags -e -a -f $(ROOT)TAGS --language-force=make Makefile mk/*.mk
 
@@ -57,15 +58,13 @@ clean :
 
 .PHONY : up
 
-up : \
-		lemmy-meter.up \
-		grafana.configure
+up : lemmy-meter.up
 
 ####################################################################################################
 
 .PHONY : down
 
-down :		lemmy-meter.down
+down : lemmy-meter.down
 
 ####################################################################################################
 
@@ -78,3 +77,11 @@ package : $(build.dir)lemmy-meter.tar.gz
 .PHONY : deploy
 
 deploy : $(ansible.playbook.deploy-remote)
+
+####################################################################################################
+
+.PHONY : reset-grafana-password
+
+reset-grafana-password : $(ansible.playbook.reset-grafana-password)
+
+####################################################################################################
