@@ -65,6 +65,5 @@
         target: up
         params:
           DEPLOY_ROOT: '~/var/'
-          admin-password: 'SMfMb1IRMUIWiQU2jDB2ToeTbDhNvgbDDTfy52zX'
       register: _result
       changed_when: _result is success
