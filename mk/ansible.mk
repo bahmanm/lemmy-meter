@@ -36,7 +36,7 @@ $(ansible.venv) :
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.lemmy-meter-server,localhost )
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.verbosity,-v )
 $(ansible.playbook.deploy-remote) : \
-		$(lemmy-meter.archive)
+		$(lemmy-meter.archive) \
 		| $(ansible.venv)
 	$(ansible.venv.activate) \
 	&& ansible-playbook \
