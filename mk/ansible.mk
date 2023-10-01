@@ -22,18 +22,19 @@ ansible.venv.activate := source $(ansible.venv)bin/activate
 ####################################################################################################
 
 ansible.playbook.deploy-remote := $(ansible.root)playbooks/deploy-remote.yml
+ansible.playbook.reset-grafana-password := $(ansible.root)playbooks/reset-grafana-password.yml
 
 ####################################################################################################
 
 $(ansible.venv) :
 	python3 -mvenv --prompt 'ansible' $(@) \
-	&& source $(@)/bin/activate \
+	&& source $(@)bin/activate \
 	&& pip install --upgrade pip \
 	&& pip install -r $(ansible.requirements)
 
 ####################################################################################################
 
-$(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.lemmy-meter-server,localhost )
+$(ansible.playbook.deploy-remote) : bmakelib.error-if-blank( ansible.lemmy-meter-server )
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.verbosity,-v )
 $(ansible.playbook.deploy-remote) : \
 		$(lemmy-meter.archive) \
@@ -46,6 +47,22 @@ $(ansible.playbook.deploy-remote) : \
 		-e 'lemmy_meter_archive_path=$(<)' \
 		-e 'lemmy_meter_server_app_root=/home/lemmy-meter/app' \
 		-e 'lemmy_meter_server_deploy_root=/home/lemmy-meter/var' \
+		-e 'lemmy_meter_grafana_new_password=$(ansible.grafana.new-password)' \
+		$(@)
+
+####################################################################################################
+
+$(ansible.playbook.reset-grafana-password) : bmakelib.error-if-blank( ansible.grafana.new-password )
+$(ansible.playbook.reset-grafana-password) : bmakelib.default-if-blank( ansible.verbosity,-v )
+$(ansible.playbook.reset-grafana-password) : | $(ansible.venv)
+	$(ansible.venv.activate) \
+	&& ansible-playbook \
+		$(ansible.verbosity) \
+		-i '$(ansible.lemmy-meter-server),' \
+		-e 'ansible_user=lemmy-meter' \
+		-e 'lemmy_meter_server_app_root=/home/lemmy-meter/app' \
+		-e 'lemmy_meter_server_deploy_root=/home/lemmy-meter/var' \
+		-e 'lemmy_meter_grafana_new_password=$(ansible.grafana.new-password)' \
 		$(@)
 
 ####################################################################################################
