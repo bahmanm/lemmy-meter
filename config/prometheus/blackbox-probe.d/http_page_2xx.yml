@@ -19,6 +19,7 @@
     probe: http_page_2xx
   targets:
     - lemdro.id
+    - lemmy.ca
     - lemmy.comfysnug.space
     - lemmy.dbzer0.com
     - lemmy.myserv.one
