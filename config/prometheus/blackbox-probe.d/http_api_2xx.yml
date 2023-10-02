@@ -18,8 +18,6 @@
 - labels:
     probe: http_api_2xx
   targets:
-    - ds9.lemmy.ml
-    - enterprise.lemmy.ml
     - lemdro.id
     - lemmy.comfysnug.space
     - lemmy.dbzer0.com
@@ -27,4 +25,3 @@
     - lemmynsfw.com
     - sh.itjust.works
     - sopuli.xyz
-    - voyager.lemmy.ml
