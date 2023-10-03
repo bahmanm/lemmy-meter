@@ -19,6 +19,7 @@
     probe: http_api_2xx
   targets:
     - aussie.zone
+    - dormi.zone
     - feddit.nl
     - lemdro.id
     - lemmy.ca
