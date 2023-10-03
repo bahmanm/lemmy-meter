@@ -19,6 +19,7 @@
     probe: http_page_2xx
   targets:
     - aussie.zone
+    - discuss.tchncs.de
     - dormi.zone
     - feddit.nl
     - lemdro.id
