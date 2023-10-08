@@ -18,30 +18,6 @@
 - labels:
     probe: http_page_2xx
   targets:
-    - aussie.zone
-    - discuss.tchncs.de
-    - dormi.zone
-    - feddit.nl
-    - lemdro.id
-    - lemmings.world
-    - lemmy.blahaj.zone
-    - lemmy.ca
-    - lemmy.comfysnug.space
-    - lemmy.dbzer0.com
-    - lemmy.myserv.one
-    - lemmy.net.au
-    - lemmy.nz
-    - lemmy.one
-    - lemmy.today
-    - lemmy.world
-    - lemmy.zip
-    - lemmygrad.ml
-    - lemmynsfw.com
-    - midwest.social
-    - pawb.social
-    - programming.dev
-    - sh.itjust.works
-    - slrpnk.net
-    - sopuli.xyz
-    - startrek.website
-    - ttrpg.network
+    - ds9.lemmy.ml
+    - voyager.lemmy.ml
+    - enterprise.lemmy.ml
