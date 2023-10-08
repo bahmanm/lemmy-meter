@@ -23,6 +23,7 @@ ansible.venv.activate := source $(ansible.venv)bin/activate
 
 ansible.playbook.deploy-remote := $(ansible.root)playbooks/deploy-remote.yml
 ansible.playbook.reset-grafana-password := $(ansible.root)playbooks/reset-grafana-password.yml
+ansible.playbook.setup-server := $(ansible.root)playbooks/setup-server.yml
 
 ####################################################################################################
 
@@ -35,6 +36,8 @@ $(ansible.venv) :
 ####################################################################################################
 
 $(ansible.playbook.deploy-remote) : bmakelib.error-if-blank( ansible.lemmy-meter-server )
+$(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.app-root,/home/lemmy-meter/app )
+$(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.deploy-root,/home/lemmy-meter/var )
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.verbosity,-v )
 $(ansible.playbook.deploy-remote) : \
 		$(lemmy-meter.archive) \
@@ -45,8 +48,8 @@ $(ansible.playbook.deploy-remote) : \
 		-i '$(ansible.lemmy-meter-server),' \
 		-e 'ansible_user=lemmy-meter' \
 		-e 'lemmy_meter_archive_path=$(<)' \
-		-e 'lemmy_meter_server_app_root=/home/lemmy-meter/app' \
-		-e 'lemmy_meter_server_deploy_root=/home/lemmy-meter/var' \
+		-e 'lemmy_meter_server_app_root=$(ansible.app-root)' \
+		-e 'lemmy_meter_server_deploy_root=$(ansible.deploy-root)' \
 		-e 'lemmy_meter_grafana_new_password=$(ansible.grafana.new-password)' \
 		$(@)
 
@@ -67,9 +70,20 @@ $(ansible.playbook.reset-grafana-password) : | $(ansible.venv)
 
 ####################################################################################################
 
-.PHONY : ansible.playbook.deploy-remote.test
-
-ansible.playbook.deploy-remote.test : | $(ansible.venv)
+$(ansible.playbook.setup-server) : bmakelib.error-if-blank( ansible.lemmy-meter-server )
+$(ansible.playbook.setup-server) : bmakelib.default-if-blank( ansible.verbosity,-v )
+$(ansible.playbook.setup-server) : bmakelib.error-if-blank( ansible.user )
+$(ansible.playbook.setup-server) : bmakelib.error-if-blank( ansible.lemmy-meter-password )
+$(ansible.playbook.setup-server) : bmakelib.default-if-blank( ansible.ssh.authorized_key,~/.ssh/id_rsa.pub )
+$(ansible.playbook.setup-server) : | $(ansible.venv)
 	$(ansible.venv.activate) \
-	&& cd $(ROOT)ansible/tests \
-	&& molecule test --scenario-name deploy_remote
+	&& hashed_password=$$(python -c \
+		"from passlib.hash import sha512_crypt; print(sha512_crypt.using(rounds=5000).hash('$(ansible.lemmy-meter-password)'))") \
+	ansible-playbook \
+		$(ansible.verbosity) \
+		-i '$(ansible.lemmy-meter-server),' \
+		-e "setup_server_hashed_password=$${hashed_password}" \
+		-e "setup_server_ssh_public_key=$$(<$(ansible.ssh.authorized_key))" \
+		--become-user $(ansible.user) \
+		--ask-pass \
+		$(@)

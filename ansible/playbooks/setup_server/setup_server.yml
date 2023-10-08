@@ -1,0 +1,92 @@
+---
+- name: Setup lemmy-meter server
+  hosts: all
+
+  tasks:
+    - ansible.builtin.assert:
+        that:
+          - setup_server_hashed_password
+          - setup_server_ssh_public_key
+          - setup_server_fqdn
+
+    - name: Run wwith sudo
+      become: true
+      block:
+        - name: Perform a dist-upgrade
+          community.general.zypper:
+            state: dist-upgrade
+            name: '*'
+            update_cache: true
+
+        - name: Install nginx, Docker and Make
+          community.general.zypper:
+            name:
+              - docker
+              - docker-compose
+              - nginx
+              - nginx-module-vts
+              - make
+            state: present
+
+        - name: Install bmakelib
+          community.general.zypper:
+            name: 'https://github.com/bahmanm/bmakelib/releases/download/v0.4.5/bmakelib-0.4.5-1.1.noarch.rpm'
+            state: present
+            disable_gpg_check: true
+
+        - name: Create lemmy-meter user
+          ansible.builtin.user:
+            name: lemmy-meter
+            groups:
+              - docker
+            password: '{{ setup_server_hashed_password }}'
+            create_home: true
+            append: true
+
+        - name: Setup authorized_keys
+          ansible.posix.authorized_key:
+            user: lemmy-meter
+            key: "{{ lookup('file', setup_server_ssh_public_key) }}"
+            manage_dir: true
+            state: present
+
+        - name: Add server FQDN to /etc/hosts
+          ansible.builtin.blockinfile:
+            path: /etc/hosts
+            block: |
+              {{ inventory_hostname }} {{ setup_server_fqdn }}
+
+        - name: Copy nginx vhost config template
+          ansible.builtin.template:
+            src: nginx-vhost.conf.j2
+            dest: '/etc/nginx/vhosts.d/{{ setup_server_fqdn }}.conf'
+            backup: true
+
+        - name: Copy lemmy-meter favicon
+          become: true
+          block:
+            - name: Ensure the directory exists
+              ansible.builtin.file:
+                path: '/src/www/{{ setup_server_fqdn }}/img/'
+                state: directory
+                owner: nginx
+                group: nginx
+
+            - name: Copy favicon
+              ansible.builtin.copy:
+                src: fav32.png
+                dest: '/src/www/{{ setup_server_fqdn }}/img/fav32.png'
+                owner: nginx
+                group: nginx
+
+        - name: Enable nginx daemon
+          ansible.builtin.systemd:
+            name: nginx
+            enabled: true
+            state: started
+
+        - name: Enable docker daemon
+          ansible.builtin.systemd:
+            name: docker
+            enabled: true
+            state: started
