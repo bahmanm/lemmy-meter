@@ -24,10 +24,20 @@ export src.dir := $(ROOT)
 export build.dir := $(ROOT)_build/
 export DEPLOY_ROOT ?= $(build.dir)data/
 
+####################################################################################################
+
 include bmakelib/bmakelib.mk
+
+.PHONY : $(ROOT)mk/lemmy-meter.mk
 include $(ROOT)mk/lemmy-meter.mk
+
+.PHONY : $(ROOT)mk/ansible.mk
 include $(ROOT)mk/ansible.mk
+
+.PHONY : $(ROOT)mk/target-instances.mk
 include $(ROOT)mk/target-instances.mk
+
+.PHONY : $(ROOT)mk/vagrant.mk
 include $(ROOT)mk/vagrant.mk
 
 ####################################################################################################
@@ -92,6 +102,6 @@ reset-grafana-password : $(ansible.playbook.reset-grafana-password)
 deploy-vagrant : export ANSIBLE_HOST_KEY_CHECKING=False
 deploy-vagrant : ansible.lemmy-meter-password := lemmy-meter
 deploy-vagrant : ansible.fqdn := test.lemmy-meter.info
-deploy-vagrant : vagrant-up
+deploy-vagrant : vagrant.up
 deploy-vagrant : ansible.lemmy-meter-server := 192.168.33.10
 deploy-vagrant : deploy

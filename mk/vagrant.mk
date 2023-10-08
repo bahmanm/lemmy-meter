@@ -16,12 +16,12 @@
 
 ####################################################################################################
 
-.PHONY : vagrant-up
+.PHONY : vagrant.up
 
-vagrant-up : bmakelib.error-if-blank( ansible.lemmy-meter-password )
-vagrant-up : bmakelib.error-if-blank( ansible.fqdn )
-vagrant-up : bmakelib.default-if-blank( ansible.ssh.authorized_key,~/.ssh/id_rsa.pub )
-vagrant-up : bmakelib.default-if-blank( vagrant.options, )
+vagrant.up : bmakelib.error-if-blank( ansible.lemmy-meter-password )
+vagrant.up : bmakelib.error-if-blank( ansible.fqdn )
+vagrant.up : bmakelib.default-if-blank( ansible.ssh.authorized_key,~/.ssh/id_rsa.pub )
+vagrant.up : bmakelib.default-if-blank( vagrant.options, )
 	$(ansible.venv.activate) \
 	&& export hashed_password=$$(python -c \
 		"from passlib.hash import sha512_crypt; print(sha512_crypt.using(rounds=5000).hash('$(ansible.lemmy-meter-password)'))") \
@@ -39,7 +39,7 @@ vagrant-up : bmakelib.default-if-blank( vagrant.options, )
 
 ####################################################################################################
 
-.PHONY : vagrant-destroy
+.PHONY : vagrant.desktroy
 
-vagrant-destroy : bmakelib.default-if-blank( vagrant.options,-f )
+vagrant.desktroy : bmakelib.default-if-blank( vagrant.options,-f )
 	vagrant destroy $(vagrant.options)
