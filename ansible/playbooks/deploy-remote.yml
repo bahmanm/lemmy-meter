@@ -14,7 +14,17 @@
         state: directory
       register: _tempdir
 
-    - name: Check if installation already exists
+    - name: Ensure installation directory exists
+      ansible.builtin.file:
+        path: '{{ lemmy_meter_server_app_root }}'
+        state: directory
+
+    - name: Ensure deploy directory exists
+      ansible.builtin.file:
+        path: '{{ lemmy_meter_server_deploy_root }}'
+        state: directory
+
+    - name: Check if there is a previous installation
       ansible.builtin.stat:
         path: '{{ lemmy_meter_server_app_root }}/Makefile'
       register: previous_instalation
