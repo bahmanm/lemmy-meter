@@ -55,6 +55,7 @@ lemmy-meter..volumes : | $(lemmy-meter..deploy-root)
 	cp \
 		$(src.dir)config/blackbox_exporter-config.yml \
 		$(src.dir)config/grafana-config.ini \
+		$(src.dir)config/json_exporter-config.yml \
 		$(lemmy-meter..deploy-root) \
 	&& mkdir -p $(lemmy-meter..deploy-root)prometheus-config \
 	&& cp -r \
@@ -62,6 +63,9 @@ lemmy-meter..volumes : | $(lemmy-meter..deploy-root)
 		$(lemmy-meter..deploy-root)prometheus-config \
 	&& mkdir -p $(lemmy-meter..deploy-root)volumes/prometheus \
 	&& mkdir -p $(lemmy-meter..deploy-root)volumes/grafana \
+	&& mkdir -p $(lemmy-meter..deploy-root)volumes/nginx \
+	&& cp $(src.dir)config/planned-downtime.json $(lemmy-meter..deploy-root)volumes/nginx/data.json
+## TODO Remove the last cp command.
 
 
 ####################################################################################################

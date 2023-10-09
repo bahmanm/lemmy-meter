@@ -46,3 +46,23 @@ services:
       - "9115:9115"
     user: "${UID}:${GID}"
     restart: always
+
+  json_exporter:
+    image: prometheuscommunity/json-exporter:v0.6.0
+    volumes:
+      - ./json_exporter-config.yml:/etc/json_exporter-config.yml
+    command:
+      - "--config.file=/etc/json_exporter-config.yml"
+    ports:
+      - "7979:7979"
+    user: "${UID}:${GID}"
+    restart: always
+
+  nginx:
+    image: nginxinc/nginx-unprivileged:1.25
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./volumes/nginx:/usr/share/nginx/html
+    user: "${UID}:${GID}"
+    restart: always

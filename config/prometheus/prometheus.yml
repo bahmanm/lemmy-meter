@@ -120,3 +120,29 @@ scrape_configs:
     static_configs:
       - targets:
           - blackbox_exporter:9115
+
+  ####################################################################################################
+  # json_exporter
+  - job_name: json_exporter
+    static_configs:
+      - targets:
+          - json_exporter:7979
+
+  ##################################################################################################
+  # sample json
+  - job_name: sample_json
+    scrape_interval: 2s
+    metrics_path: /probe
+    params:
+      module:
+        - default
+    static_configs:
+      - targets:
+          - http://nginx:8080/data.json
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: json_exporter:7979
