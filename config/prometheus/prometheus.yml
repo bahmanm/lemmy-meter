@@ -26,7 +26,6 @@ global:
 
 scrape_configs:
   ##################################################################################################
-  # api_getPosts
 
   - job_name: api_getPosts
     scrape_interval: 1m
@@ -47,7 +46,6 @@ scrape_configs:
         target_label: __param_module
 
   ##################################################################################################
-  # api_getComments
 
   - job_name: api_getComments
     scrape_interval: 1m
@@ -69,7 +67,6 @@ scrape_configs:
         target_label: __param_module
 
   ##################################################################################################
-  # api_getCommunities
 
   - job_name: api_getCommunities
     scrape_interval: 1m
@@ -91,7 +88,6 @@ scrape_configs:
         target_label: __param_module
 
   ##################################################################################################
-  # webpage_landing_page
 
   - job_name: webpage_landing_page
     scrape_interval: 1m
@@ -113,24 +109,8 @@ scrape_configs:
         target_label: __param_module
 
   ##################################################################################################
-  # blackbox_exporter
 
-  - job_name: blackbox_exporter
-    metrics_path: /metrics
-    static_configs:
-      - targets:
-          - blackbox_exporter:9115
-
-  ####################################################################################################
-  # json_exporter
-  - job_name: json_exporter
-    static_configs:
-      - targets:
-          - json_exporter:7979
-
-  ##################################################################################################
-  # sample json
-  - job_name: sample_json
+  - job_name: planned_downtime_in_progress
     scrape_interval: 2s
     metrics_path: /probe
     params:
@@ -138,11 +118,21 @@ scrape_configs:
         - default
     static_configs:
       - targets:
-          - http://nginx:8080/data.json
+          - http://planned_downtime:6060/planned-downtime-in-progress.json
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
-      - source_labels: [__param_target]
-        target_label: instance
       - target_label: __address__
         replacement: json_exporter:7979
+
+  ##################################################################################################
+
+  - job_name: node_stats
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - blackbox_exporter:9115
+          - planned_downtime:6060
+          - json_exporter:7979
+          - grafana:3000
+          - prometheus:9090
