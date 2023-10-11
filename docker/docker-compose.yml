@@ -58,11 +58,22 @@ services:
     user: "${UID}:${GID}"
     restart: always
 
-  nginx:
-    image: nginxinc/nginx-unprivileged:1.25
+  planned_downtime:
+    build:
+      context: .
+      dockerfile: perl.dockerfile
+    image: planned_downtime:latest
+    entrypoint:
+      - "/usr/bin/downtime-sheet-processor.pl"
+    command:
+      - "prefork"
+      - "-m"
+      - "production"
+      - "-l"
+      - "http://*:6060"
     ports:
-      - "8080:8080"
+      - "6060:6060"
     volumes:
-      - ./volumes/nginx:/usr/share/nginx/html
+      - ./downtime-sheet-processor.pl:/usr/bin/downtime-sheet-processor.pl
     user: "${UID}:${GID}"
     restart: always
