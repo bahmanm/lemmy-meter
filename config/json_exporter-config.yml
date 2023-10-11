@@ -1,0 +1,12 @@
+---
+modules:
+  default:
+    metrics:
+      - name: planned_downtime
+        type: object
+        path: "{ .planned_downtime[*] }"
+        help: Planned downtime indicator
+        labels:
+          lemmy_instance: "{ .lemmy_instance }"
+        values:
+          indicator: 100

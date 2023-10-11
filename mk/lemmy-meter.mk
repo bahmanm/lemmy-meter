@@ -55,14 +55,16 @@ lemmy-meter..volumes : | $(lemmy-meter..deploy-root)
 	cp \
 		$(src.dir)config/blackbox_exporter-config.yml \
 		$(src.dir)config/grafana-config.ini \
+		$(src.dir)config/json_exporter-config.yml \
+		$(src.dir)docker/downtime-sheet-processor.pl \
+		$(src.dir)docker/perl.dockerfile \
 		$(lemmy-meter..deploy-root) \
 	&& mkdir -p $(lemmy-meter..deploy-root)prometheus-config \
 	&& cp -r \
 		$(src.dir)config/prometheus/* \
 		$(lemmy-meter..deploy-root)prometheus-config \
 	&& mkdir -p $(lemmy-meter..deploy-root)volumes/prometheus \
-	&& mkdir -p $(lemmy-meter..deploy-root)volumes/grafana \
-
+	&& mkdir -p $(lemmy-meter..deploy-root)volumes/grafana
 
 ####################################################################################################
 

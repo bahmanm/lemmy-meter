@@ -2,7 +2,10 @@
 
 Vagrant.configure("2") do |config|
 
-  config.vm.provider :libvirt
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.memory = 2048
+    libvirt.cpus = 2
+  end
 
   config.vm.define :lemmy_meter do |lemmy_meter|
     lemmy_meter.vm.box = "opensuse/Tumbleweed.x86_64"

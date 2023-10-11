@@ -46,3 +46,34 @@ services:
       - "9115:9115"
     user: "${UID}:${GID}"
     restart: always
+
+  json_exporter:
+    image: prometheuscommunity/json-exporter:v0.6.0
+    volumes:
+      - ./json_exporter-config.yml:/etc/json_exporter-config.yml
+    command:
+      - "--config.file=/etc/json_exporter-config.yml"
+    ports:
+      - "7979:7979"
+    user: "${UID}:${GID}"
+    restart: always
+
+  planned_downtime:
+    build:
+      context: .
+      dockerfile: perl.dockerfile
+    image: planned_downtime:latest
+    entrypoint:
+      - "/usr/bin/downtime-sheet-processor.pl"
+    command:
+      - "prefork"
+      - "-m"
+      - "production"
+      - "-l"
+      - "http://*:6060"
+    ports:
+      - "6060:6060"
+    volumes:
+      - ./downtime-sheet-processor.pl:/usr/bin/downtime-sheet-processor.pl
+    user: "${UID}:${GID}"
+    restart: always
