@@ -111,7 +111,7 @@ scrape_configs:
   ##################################################################################################
 
   - job_name: planned_downtime_in_progress
-    scrape_interval: 2s
+    scrape_interval: 1m
     metrics_path: /probe
     params:
       module:
