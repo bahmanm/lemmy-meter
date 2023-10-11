@@ -41,5 +41,5 @@ vagrant.up : bmakelib.default-if-blank( vagrant.options, )
 
 .PHONY : vagrant.desktroy
 
-vagrant.desktroy : bmakelib.default-if-blank( vagrant.options,-f )
+vagrant.destroy : bmakelib.default-if-blank( vagrant.options,-f )
 	vagrant destroy $(vagrant.options)
