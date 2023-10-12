@@ -62,7 +62,7 @@ services:
     build:
       context: .
       dockerfile: perl.dockerfile
-    image: planned_downtime:latest
+    image: planned_downtime:dd1021c
     entrypoint:
       - "/usr/bin/downtime-sheet-processor.pl"
     command:
