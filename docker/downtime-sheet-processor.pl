@@ -16,7 +16,6 @@ use Time::Seconds;
 
 use Mojo::UserAgent;
 use Mojolicious::Lite;
-plugin 'AutoReload';
 
 ####################################################################################################
 
