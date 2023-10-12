@@ -64,11 +64,12 @@ get '/planned-downtime-in-progress.json' => sub ($c) {
 
 ####################################################################################################
 
-sub get_active_instances($csv) {
-    my $csv_rows = load_csv($csv);
-    my $records  = process_rows($csv_rows);
+sub get_active_instances ($csv) {
+    my $csv_rows       = load_csv($csv);
+    my $records        = process_rows($csv_rows);
     my $active_records = active_records( $records, $now_ts );
-    my @active_instances = map { {lemmy_instance => $_->{instance}} } @$active_records;
+    my @active_instances =
+      map { { lemmy_instance => $_->{instance} } } @$active_records;
     return \@active_instances;
 }
 
