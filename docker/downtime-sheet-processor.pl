@@ -24,7 +24,7 @@ use constant {
     FALSE                   => 0,
     PLANNED_DOWNTIME_GSHEET =>
 'https://docs.google.com/spreadsheets/d/1KS3pMzrkW4888LbtqoGR5xylLCfYfkeHrSyMHIIvAfg/export?exportFormat=csv',
-    GSHEET_HEADER_ROWS => 10,
+    GSHEET_HEADER_ROWS => 12,
     TIMESTAMP_FORMAT   => '%Y-%m-%d %H:%M:%S'
 };
 
