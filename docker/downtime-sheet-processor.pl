@@ -49,6 +49,12 @@ our $prom_gsheet_download_error_counter = $prometheus->new_counter(
 
 ####################################################################################################
 
+get '/metrics' => sub ($c) {
+    $c->render( text => $prometheus->render );
+};
+
+####################################################################################################
+
 get '/planned-downtime-in-progress.json' => sub ($c) {
     $prom_http_requests_counter->inc;
     my $csv = download_gsheet();
@@ -67,72 +73,11 @@ get '/planned-downtime-in-progress.json' => sub ($c) {
 sub get_active_instances ($csv) {
     my $csv_rows       = load_csv($csv);
     my $records        = process_rows($csv_rows);
-    my $active_records = active_records( $records, $now_ts );
+    my $active_records = get_active_records( $records, $now_ts );
     my @active_instances =
       map { { lemmy_instance => $_->{instance} } } @$active_records;
     return \@active_instances;
 }
-
-####################################################################################################
-
-get '/metrics' => sub ($c) {
-    $c->render( text => $prometheus->render );
-};
-
-####################################################################################################
-
-sub filter_active_instances ($csv) {
-    my $now    = strftime( '%Y-%m-%dT%H:%M', localtime() );
-    my @result = ();
-    my @lines  = split( /\r?\n/, $csv );
-    foreach my $line ( @lines[ GSHEET_HEADER_ROWS .. $#lines ] ) {
-        say $line;
-        my @fields = split( /,/, $line );
-        if ( $now ge $fields[1] && $now le $fields[2] ) {
-            push( @result, { lemmy_instance => $fields[0] } );
-        }
-    }
-    return \@result;
-}
-
-####################################################################################################
-
-sub download_gsheet() {
-    my $ua = Mojo::UserAgent->new;
-    $ua->max_redirects(2);
-    my $resp = $ua->get(PLANNED_DOWNTIME_GSHEET)->result;
-    if ( $resp->is_success ) {
-        return $resp->body;
-    }
-    else {
-        $prom_gsheet_download_error_counter->inc;
-        return '';
-    }
-}
-
-####################################################################################################
-
-app->start;
-
-####################################################################################################
-
-# my $csv      = download_gsheet();
-# my $csv_rows = load_csv($csv);
-# my $records  = process_rows($csv_rows);
-# sep();
-# say "now is $now_ts";
-# sep();
-# dump($records);
-# sep();
-# my $active_records = active_records( $records, $now_ts );
-# dump($active_records);
-# my @active_instances = map { $_->{instance} } @$active_records;
-# dump(@active_instances);
-
-# sub sep () {
-#     say '-' x 100;
-#     $|++;
-# }
 
 ####################################################################################################
 
@@ -237,7 +182,7 @@ sub process_cron_schedule ($row) {
 
 ####################################################################################################
 
-sub active_records ( $records, $now_ts ) {
+sub get_active_records ( $records, $now_ts ) {
     my $result = [];
     foreach my $record (@$records) {
         if ( $now_ts ge $record->{start_ts} && $now_ts le $record->{end_ts} ) {
@@ -246,3 +191,22 @@ sub active_records ( $records, $now_ts ) {
     }
     return $result;
 }
+
+####################################################################################################
+
+sub download_gsheet() {
+    my $ua = Mojo::UserAgent->new;
+    $ua->max_redirects(2);
+    my $resp = $ua->get(PLANNED_DOWNTIME_GSHEET)->result;
+    if ( $resp->is_success ) {
+        return $resp->body;
+    }
+    else {
+        $prom_gsheet_download_error_counter->inc;
+        return '';
+    }
+}
+
+####################################################################################################
+
+app->start;
