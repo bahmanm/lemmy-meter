@@ -20,13 +20,16 @@ version: "3.8"
 services:
   prometheus:
     image: prom/prometheus:v2.47.0
-    volumes:
-      - ./prometheus-config:/etc/prometheus
-      - ./volumes/prometheus:/prometheus
+    command:
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=60d"
+      - "--config.file=/etc/prometheus/prometheus.yml"
     ports:
       - "9090:9090"
-    user: "${UID}:${GID}"
-    restart: "no"
+    volumes:
+      - ./prometheus-config:/etc/prometheus
+      - prometheus-data:/prometheus
+    restart: always
 
   grafana:
     image: grafana/grafana:9.4.14
@@ -77,3 +80,10 @@ services:
       - ./downtime-sheet-processor.pl:/usr/bin/downtime-sheet-processor.pl
     user: "${UID}:${GID}"
     restart: always
+
+volumes:
+  prometheus-data:
+
+networks:
+  lemmy-meter:
+    attachable: true
