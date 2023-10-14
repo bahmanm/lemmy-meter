@@ -63,7 +63,6 @@ lemmy-meter..volumes : | $(lemmy-meter..deploy-root)
 	&& cp -r \
 		$(src.dir)config/prometheus/* \
 		$(lemmy-meter..deploy-root)prometheus-config \
-	&& mkdir -p $(lemmy-meter..deploy-root)volumes/prometheus \
 	&& mkdir -p $(lemmy-meter..deploy-root)volumes/grafana
 
 ####################################################################################################
