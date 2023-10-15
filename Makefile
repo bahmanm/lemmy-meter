@@ -28,8 +28,8 @@ export DEPLOY_ROOT ?= $(build.dir)data/
 
 include bmakelib/bmakelib.mk
 
-.PHONY : $(ROOT)mk/lemmy-meter.mk
-include $(ROOT)mk/lemmy-meter.mk
+#.PHONY : $(ROOT)mk/lemmy-meter.mk
+#include $(ROOT)mk/lemmy-meter.mk
 
 .PHONY : $(ROOT)mk/ansible.mk
 include $(ROOT)mk/ansible.mk
@@ -39,6 +39,9 @@ include $(ROOT)mk/target-instances.mk
 
 .PHONY : $(ROOT)mk/vagrant.mk
 include $(ROOT)mk/vagrant.mk
+
+.PHONY : cluster/Makefile
+include $(ROOT)cluster/Makefile
 
 ####################################################################################################
 

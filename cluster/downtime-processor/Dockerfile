@@ -5,3 +5,4 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN cpan Mojo::Lite Net::Prometheus Mojo::UserAgent Data::Dump
+RUN cpan Schedule::Cron::Events Text::CSV

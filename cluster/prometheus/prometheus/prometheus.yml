@@ -41,7 +41,7 @@ scrape_configs:
         target_label: __param_target
         replacement: https://$1/api/v3/post/list?limit=1
       - target_label: __address__
-        replacement: blackbox_exporter:9115
+        replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
 
@@ -62,7 +62,7 @@ scrape_configs:
         target_label: __param_target
         replacement: https://$1/api/v3/comment/list?limit=1
       - target_label: __address__
-        replacement: blackbox_exporter:9115
+        replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
 
@@ -83,7 +83,7 @@ scrape_configs:
         target_label: __param_target
         replacement: https://$1/api/v3/community/list?limit=1
       - target_label: __address__
-        replacement: blackbox_exporter:9115
+        replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
 
@@ -104,7 +104,7 @@ scrape_configs:
         target_label: __param_target
         replacement: https://$1/
       - target_label: __address__
-        replacement: blackbox_exporter:9115
+        replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
 
@@ -118,12 +118,12 @@ scrape_configs:
         - default
     static_configs:
       - targets:
-          - http://planned_downtime:6060/planned-downtime-in-progress.json
+          - http://downtime-processor:6060/planned-downtime-in-progress.json
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
       - target_label: __address__
-        replacement: json_exporter:7979
+        replacement: json-exporter:7979
 
   ##################################################################################################
 

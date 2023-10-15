@@ -27,33 +27,33 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus-config:/etc/prometheus
+      - ${cluster.deploy-root}/prometheus:/etc/prometheus
       - prometheus-data:/prometheus
     restart: always
 
   grafana:
     image: grafana/grafana:9.4.14
     volumes:
-      - ./grafana-config.ini:/etc/grafana/grafana.ini
+      - ${cluster.deploy-root}/grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./volumes/grafana:/var/lib/grafana
     ports:
       - "3000:3000"
     user: "${UID}:${GID}"
     restart: always
 
-  blackbox_exporter:
+  blackbox-exporter:
     image: prom/blackbox-exporter:v0.24.0
     volumes:
-      - ./blackbox_exporter-config.yml:/etc/blackbox_exporter/config.yml
+      - ${cluster.deploy-root}/blackbox-exporter/config.yml:/etc/blackbox_exporter/config.yml
     ports:
       - "9115:9115"
     user: "${UID}:${GID}"
     restart: always
 
-  json_exporter:
+  json-exporter:
     image: prometheuscommunity/json-exporter:v0.6.0
     volumes:
-      - ./json_exporter-config.yml:/etc/json_exporter-config.yml
+      - ${cluster.deploy-root}/json-exporter/config.yml:/etc/json_exporter-config.yml
     command:
       - "--config.file=/etc/json_exporter-config.yml"
     ports:
@@ -61,13 +61,10 @@ services:
     user: "${UID}:${GID}"
     restart: always
 
-  planned_downtime:
-    build:
-      context: .
-      dockerfile: perl.dockerfile
-    image: planned_downtime:latest
+  planned-downtime:
+    image: bahmanm/lemmy-meter.planned-downtime:dd1021c
     entrypoint:
-      - "/usr/bin/downtime-sheet-processor.pl"
+      - "/usr/bin/downtime-processor.pl"
     command:
       - "prefork"
       - "-m"
@@ -77,7 +74,7 @@ services:
     ports:
       - "6060:6060"
     volumes:
-      - ./downtime-sheet-processor.pl:/usr/bin/downtime-sheet-processor.pl
+      - ${cluster.deploy-root}/downtime-processor/downtime-processor.pl:/usr/bin/downtime-processor.pl
     user: "${UID}:${GID}"
     restart: always
 

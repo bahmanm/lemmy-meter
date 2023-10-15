@@ -2,3 +2,5 @@
 *\#*
 /_build/
 TAGS
+.vagrant
+.vscode
