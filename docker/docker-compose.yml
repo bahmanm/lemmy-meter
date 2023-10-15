@@ -62,10 +62,7 @@ services:
     restart: always
 
   planned_downtime:
-    build:
-      context: .
-      dockerfile: perl.dockerfile
-    image: planned_downtime:latest
+    image: bahmanm/lemmy-meter.planned-downtime:dd1021c
     entrypoint:
       - "/usr/bin/downtime-sheet-processor.pl"
     command:
