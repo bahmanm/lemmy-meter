@@ -28,9 +28,6 @@ export DEPLOY_ROOT ?= $(build.dir)data/
 
 include bmakelib/bmakelib.mk
 
-#.PHONY : $(ROOT)mk/lemmy-meter.mk
-#include $(ROOT)mk/lemmy-meter.mk
-
 .PHONY : $(ROOT)mk/ansible.mk
 include $(ROOT)mk/ansible.mk
 
@@ -84,7 +81,22 @@ down : lemmy-meter.down
 
 .PHONY : package
 
-package : $(build.dir)lemmy-meter.tar.gz
+package : package.tar := $(build.dir)$(NAME).tar
+package : clean cluster.deploy
+	tar \
+		-C $(DEPLOY_ROOT)$(NAME)/ \
+		--create \
+		--transform 's#^.#var#' \
+		--file $(package.tar) \
+		. \
+	&& tar \
+		-C $(ROOT) \
+		--append \
+		--file $(package.tar) \
+		bin/lemmy-meter \
+	&& gzip \
+		--force \
+		$(package.tar)
 
 ####################################################################################################
 
