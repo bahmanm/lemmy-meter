@@ -34,8 +34,8 @@ include $(ROOT)ansible/Makefile
 .PHONY : $(ROOT)mk/target-instances.mk
 include $(ROOT)mk/target-instances.mk
 
-.PHONY : $(ROOT)mk/vagrant.mk
-include $(ROOT)mk/vagrant.mk
+.PHONY : $(ROOT)vagrant/Makefile
+include $(ROOT)vagrant/Makefile
 
 .PHONY : cluster/Makefile
 include $(ROOT)cluster/Makefile
