@@ -31,6 +31,17 @@ include $(cluster.services:%=$(cluster.srcdir)%/Makefile)
 
 ####################################################################################################
 
+define cluster.docker-compose
+export UID \
+	&& export GID=$$(id -g) \
+	&& export CLUSTER_DEPLOY_ROOT=$(cluster.deploy-root) \
+	&& docker compose \
+		--file $(cluster.deploy-root)docker-compose.yml \
+		--project-name $(NAME)
+endef
+
+####################################################################################################
+
 $(cluster.deploy-root) :
 	mkdir -p $(@)
 
@@ -64,12 +75,7 @@ cluster.deploy : $(cluster.services:%=cluster.%.deploy)
 .PHONY : cluster.up
 
 cluster.up : cluster.deploy
-	export UID \
-	&& export GID=$$(id -g) \
-	&& export CLUSTER_DEPLOY_ROOT=$(cluster.deploy-root) \
-	&& docker compose \
-		--file $(cluster.deploy-root)docker-compose.yml \
-		--project-name $(NAME) \
+	$(cluster.docker-compose) \
 		up \
 		--remove-orphans \
 		--pull always \
@@ -80,11 +86,12 @@ cluster.up : cluster.deploy
 .PHONY : cluster.down
 
 cluster.down : cluster.down
-	export UID \
-	&& export GID=$$(id -g) \
-	&& export CLUSTER_DEPLOY_ROOT=$(cluster.deploy-root) \
-	&& docker compose \
-		--file $(cluster.deploy-root)docker-compose.yml \
-		--project-name $(NAME) \
+	$(cluster.docker-compose) \
 		down \
 		--remove-orphans
+
+####################################################################################################
+
+.PHONY : cluster.restart
+	$(cluster.docker-compose) \
+		restart
