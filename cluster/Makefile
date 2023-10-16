@@ -66,6 +66,7 @@ cluster.push : $(cluster.services:%=cluster.%.push)
 
 .PHONY : cluster.deploy
 
+cluster.deploy : cluster.build
 cluster.deploy : | $(cluster.deploy-root)
 cluster.deploy : $(cluster.deploy-root)docker-compose.yml
 cluster.deploy : $(cluster.services:%=cluster.%.deploy)
@@ -93,5 +94,14 @@ cluster.down : cluster.down
 ####################################################################################################
 
 .PHONY : cluster.restart
+
+cluster.restart :
 	$(cluster.docker-compose) \
 		restart
+
+####################################################################################################
+
+cluster.restart(%) :
+	$(cluster.docker-compose) \
+		restart \
+		$(*)
