@@ -14,7 +14,7 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
-ansible.root := $(ROOT)ansible/
+ansible.root := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 ansible.venv := $(build.dir)ansible-venv/
 ansible.requirements := $(ansible.root)requirements.txt
 ansible.venv.activate := source $(ansible.venv)bin/activate
