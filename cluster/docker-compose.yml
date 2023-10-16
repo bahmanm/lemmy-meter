@@ -16,7 +16,6 @@
 
 ---
 version: "3.8"
-
 services:
   prometheus:
     image: prom/prometheus:v2.47.0
@@ -27,44 +26,40 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus-config:/etc/prometheus
-      - prometheus-data:/prometheus
+      - "${CLUSTER_DEPLOY_ROOT}/prometheus:/etc/prometheus"
+      - "prometheus-data:/prometheus"
     restart: always
-
   grafana:
     image: grafana/grafana:9.4.14
     volumes:
-      - ./grafana-config.ini:/etc/grafana/grafana.ini
-      - ./volumes/grafana:/var/lib/grafana
+      - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.ini:/etc/grafana/grafana.ini"
+      - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.db:/var/lib/grafana/grafana.db"
     ports:
       - "3000:3000"
     user: "${UID}:${GID}"
     restart: always
-
-  blackbox_exporter:
+  blackbox-exporter:
     image: prom/blackbox-exporter:v0.24.0
     volumes:
-      - ./blackbox_exporter-config.yml:/etc/blackbox_exporter/config.yml
+      - "${CLUSTER_DEPLOY_ROOT}/blackbox-exporter/config.yml:/etc/blackbox_exporter/config.yml"
     ports:
       - "9115:9115"
     user: "${UID}:${GID}"
     restart: always
-
-  json_exporter:
+  json-exporter:
     image: prometheuscommunity/json-exporter:v0.6.0
     volumes:
-      - ./json_exporter-config.yml:/etc/json_exporter-config.yml
+      - "${CLUSTER_DEPLOY_ROOT}/json-exporter/config.yml:/etc/json_exporter-config.yml"
     command:
       - "--config.file=/etc/json_exporter-config.yml"
     ports:
       - "7979:7979"
     user: "${UID}:${GID}"
     restart: always
-
-  planned_downtime:
-    image: bahmanm/lemmy-meter.planned-downtime:dd1021c
+  planned-downtime:
+    image: "bahmanm/lemmy-meter.downtime-processor:ab95e0b"
     entrypoint:
-      - "/usr/bin/downtime-sheet-processor.pl"
+      - "/usr/bin/downtime-processor.pl"
     command:
       - "prefork"
       - "-m"
@@ -74,13 +69,11 @@ services:
     ports:
       - "6060:6060"
     volumes:
-      - ./downtime-sheet-processor.pl:/usr/bin/downtime-sheet-processor.pl
+      - "${CLUSTER_DEPLOY_ROOT}/downtime-processor/downtime-processor.pl:/usr/bin/downtime-processor.pl"
     user: "${UID}:${GID}"
     restart: always
-
 volumes:
   prometheus-data:
-
 networks:
   lemmy-meter:
     attachable: true

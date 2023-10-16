@@ -14,110 +14,94 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
-SHELL := /usr/bin/env -S bash -o pipefail
-
-.DEFAULT_GOAL := up
-
-export NAME := lemmy-meter
-export ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-export src.dir := $(ROOT)
-export build.dir := $(ROOT)_build/
-export DEPLOY_ROOT ?= $(build.dir)data/
+export cluster.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+export cluster.tag := $(shell git rev-parse --short HEAD)
+export cluster.prefix := bahmanm/$(NAME).
+export cluster.deploy-root := $(DEPLOY_ROOT)lemmy-meter/
 
 ####################################################################################################
 
-include bmakelib/bmakelib.mk
-
-.PHONY : $(ROOT)ansible/Makefile
-include $(ROOT)ansible/Makefile
-
-.PHONY : $(ROOT)mk/target-instances.mk
-include $(ROOT)mk/target-instances.mk
-
-.PHONY : $(ROOT)vagrant/Makefile
-include $(ROOT)vagrant/Makefile
-
-.PHONY : cluster/Makefile
-include $(ROOT)cluster/Makefile
+cluster.services := prometheus grafana blackbox-exporter json-exporter downtime-processor
 
 ####################################################################################################
 
-$(build.dir) :
+.PHONY : $(cluster.services:%=$(cluster.srcdir)%/Makefile)
+
+include $(cluster.services:%=$(cluster.srcdir)%/Makefile)
+
+####################################################################################################
+
+define cluster.docker-compose
+export UID \
+	&& export GID=$$(id -g) \
+	&& export CLUSTER_DEPLOY_ROOT=$(cluster.deploy-root) \
+	&& docker compose \
+		--file $(cluster.deploy-root)docker-compose.yml \
+		--project-name $(NAME)
+endef
+
+####################################################################################################
+
+$(cluster.deploy-root) :
 	mkdir -p $(@)
 
 ####################################################################################################
 
-$(DEPLOY_ROOT) : 	| $(build.dir)
-	mkdir -p $(@)
+$(cluster.deploy-root)docker-compose.yml : $(cluster.srcdir)docker-compose.yml
+	cp $(<) $(@)
 
 ####################################################################################################
 
-TAGS : \
-		$(src.dir)Makefile \
-		$(src.dir)mk/*.mk
-	universal-ctags -e -a -f $(ROOT)TAGS --language-force=make Makefile mk/*.mk
+.PHONY : cluster.build
 
+cluster.build : $(cluster.services:%=cluster.%.build)
 
 ####################################################################################################
 
-.PHONY : clean
+.PHONY : cluster.push
 
-clean :
-	-rm -rf $(build.dir)
-
-####################################################################################################
-
-.PHONY : up
-
-up : lemmy-meter.up
+cluster.push : $(cluster.services:%=cluster.%.push)
 
 ####################################################################################################
 
-.PHONY : down
+.PHONY : cluster.deploy
 
-down : lemmy-meter.down
-
-####################################################################################################
-
-.PHONY : package
-
-package : package.tar := $(build.dir)$(NAME).tar
-package : clean cluster.deploy
-	tar \
-		-C $(DEPLOY_ROOT)$(NAME)/ \
-		--create \
-		--transform 's#^.#var#' \
-		--file $(package.tar) \
-		. \
-	&& tar \
-		-C $(ROOT) \
-		--append \
-		--file $(package.tar) \
-		bin/lemmy-meter \
-	&& gzip \
-		--force \
-		$(package.tar)
+cluster.deploy : cluster.build
+cluster.deploy : | $(cluster.deploy-root)
+cluster.deploy : $(cluster.deploy-root)docker-compose.yml
+cluster.deploy : $(cluster.services:%=cluster.%.deploy)
 
 ####################################################################################################
 
-.PHONY : deploy
+.PHONY : cluster.up
 
-deploy : deploy-package := $(build.dir)$(NAME).tar.gz
-deploy : $(ansible.playbook.deploy-remote)
-
-####################################################################################################
-
-.PHONY : reset-grafana-password
-
-reset-grafana-password : $(ansible.playbook.reset-grafana-password)
+cluster.up : cluster.deploy
+	$(cluster.docker-compose) \
+		up \
+		--remove-orphans \
+		--pull always \
+		--detach
 
 ####################################################################################################
 
-.PHONY : deploy-vagrant
+.PHONY : cluster.down
 
-deploy-vagrant : export ANSIBLE_HOST_KEY_CHECKING=False
-deploy-vagrant : ansible.lemmy-meter-password := lemmy-meter
-deploy-vagrant : ansible.fqdn := test.lemmy-meter.info
-deploy-vagrant : vagrant.up
-deploy-vagrant : ansible.lemmy-meter-server := 192.168.33.10
-deploy-vagrant : deploy
+cluster.down : cluster.down
+	$(cluster.docker-compose) \
+		down \
+		--remove-orphans
+
+####################################################################################################
+
+.PHONY : cluster.restart
+
+cluster.restart :
+	$(cluster.docker-compose) \
+		restart
+
+####################################################################################################
+
+cluster.restart(%) :
+	$(cluster.docker-compose) \
+		restart \
+		$(*)

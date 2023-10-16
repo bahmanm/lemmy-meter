@@ -14,6 +14,8 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
+vagrant.root := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
 ####################################################################################################
 
 .PHONY : vagrant.up
@@ -23,7 +25,8 @@ vagrant.up : bmakelib.error-if-blank( ansible.fqdn )
 vagrant.up : bmakelib.default-if-blank( ansible.ssh.authorized_key,~/.ssh/id_rsa.pub )
 vagrant.up : bmakelib.default-if-blank( vagrant.options, )
 vagrant.up : | $(ansible.venv)
-	$(ansible.venv.activate) \
+	cd $(vagrant.root) \
+	&& $(ansible.venv.activate) \
 	&& export hashed_password=$$(python -c \
 		"from passlib.hash import sha512_crypt; print(sha512_crypt.using(rounds=5000).hash('$(ansible.lemmy-meter-password)'))") \
 	&& { \
@@ -43,4 +46,5 @@ vagrant.up : | $(ansible.venv)
 .PHONY : vagrant.desktroy
 
 vagrant.destroy : bmakelib.default-if-blank( vagrant.options,-f )
-	vagrant destroy $(vagrant.options)
+	cd $(vagrant.root) \
+	&& vagrant destroy $(vagrant.options)

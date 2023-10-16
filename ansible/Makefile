@@ -14,7 +14,7 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
-ansible.root := $(ROOT)ansible/
+ansible.root := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 ansible.venv := $(build.dir)ansible-venv/
 ansible.requirements := $(ansible.root)requirements.txt
 ansible.venv.activate := source $(ansible.venv)bin/activate
@@ -39,18 +39,15 @@ $(ansible.playbook.deploy-remote) : bmakelib.error-if-blank( ansible.lemmy-meter
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.app-root,/home/lemmy-meter/app )
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.deploy-root,/home/lemmy-meter/var )
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.verbosity,-v )
+$(ansible.playbook.deploy-remote) : bmakelib.error-if-blank( deploy-package )
 $(ansible.playbook.deploy-remote) : \
-		$(lemmy-meter.archive) \
 		| $(ansible.venv)
 	$(ansible.venv.activate) \
 	&& ansible-playbook \
 		$(ansible.verbosity) \
 		-i '$(ansible.lemmy-meter-server),' \
 		-e 'ansible_user=lemmy-meter' \
-		-e 'lemmy_meter_archive_path=$(<)' \
-		-e 'lemmy_meter_server_app_root=$(ansible.app-root)' \
-		-e 'lemmy_meter_server_deploy_root=$(ansible.deploy-root)' \
-		-e 'lemmy_meter_grafana_new_password=$(ansible.grafana.new-password)' \
+		-e 'lemmy_meter_archive_path=$(deploy-package)' \
 		$(@)
 
 ####################################################################################################

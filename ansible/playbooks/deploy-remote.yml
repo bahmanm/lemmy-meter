@@ -6,63 +6,46 @@
     - ansible.builtin.assert:
         that:
           - lemmy_meter_archive_path is defined
-          - lemmy_meter_server_app_root is defined
-          - lemmy_meter_server_deploy_root is defined
 
     - name: Create a temp directory
       ansible.builtin.tempfile:
         state: directory
       register: _tempdir
 
-    - name: Ensure installation directory exists
-      ansible.builtin.file:
-        path: '{{ lemmy_meter_server_app_root }}'
-        state: directory
-
-    - name: Ensure deploy directory exists
-      ansible.builtin.file:
-        path: '{{ lemmy_meter_server_deploy_root }}'
-        state: directory
-
     - name: Check if there is a previous installation
       ansible.builtin.stat:
-        path: '{{ lemmy_meter_server_app_root }}/Makefile'
+        path: "${HOME}/var"
       register: previous_instalation
 
     - name: Stop the cluster
       when: previous_instalation.stat.exists
-      community.general.make:
-        chdir: '{{ lemmy_meter_server_app_root }}'
-        target: down
-        params:
-          DEPLOY_ROOT: '~/var/'
+      ansible.builtin.command:
+        cmd: >-
+          bin/lemmy-meter down
       register: _result
       changed_when: _result is success
 
     - name: Backup grafana.db
       when: previous_instalation.stat.exists
       ansible.builtin.copy:
-        src: '{{ lemmy_meter_server_deploy_root }}/lemmy-meter/volumes/grafana/grafana.db'
-        dest: '{{ _tempdir.path }}/grafana.db.backup'
+        src: "${HOME}/var/grafana/grafana.db"
+        dest: "{{ _tempdir.path }}/grafana.db.backup"
         remote_src: true
       register: _result
       changed_when: _result is success
 
     - name: Extract the archive
       ansible.builtin.unarchive:
-        src: '{{ lemmy_meter_archive_path }}'
-        dest: '{{ lemmy_meter_server_app_root }}'
-        extra_opts:
-          - --transform
-          - "s#^lemmy-meter##"
+        src: "{{ lemmy_meter_archive_path }}"
+        dest: "${HOME}"
       register: _result
       changed_when: _result is success
 
     - name: Restore grafana.db
       when: previous_instalation.stat.exists
       ansible.builtin.copy:
-        src: '{{ _tempdir.path }}/grafana.db.backup'
-        dest: '{{ lemmy_meter_server_app_root }}/config/grafana.db'
+        src: "{{ _tempdir.path }}/grafana.db.backup"
+        dest: "${HOME}/var/grafana/grafana.db"
         force: true
         backup: true
         remote_src: true
@@ -70,10 +53,8 @@
       changed_when: _result is success
 
     - name: Start the cluster
-      community.general.make:
-        chdir: '{{ lemmy_meter_server_app_root }}'
-        target: up
-        params:
-          DEPLOY_ROOT: '~/var/'
+      ansible.builtin.command:
+        cmd: >-
+          ${HOME}/bin/lemmy-meter up
       register: _result
       changed_when: _result is success
