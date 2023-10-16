@@ -23,6 +23,12 @@ cluster.blackbox-exporter.build : ;
 
 ####################################################################################################
 
+.PHONY : cluster.blackbox-exporter.push
+
+cluster.blackbox-exporter.push : ;
+
+####################################################################################################
+
 $(cluster.deploy-root)blackbox-exporter: $(cluster.blackbox-exporter.srcdir)config.yml
 	mkdir -p $(@) \
 	&& cp -r $(<) $(@)

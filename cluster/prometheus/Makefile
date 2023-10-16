@@ -24,6 +24,12 @@ cluster.prometheus.build : ;
 
 ####################################################################################################
 
+.PHONY : cluster.prometheus.push
+
+cluster.prometheus.push : ;
+
+####################################################################################################
+
 $(cluster.deploy-root)prometheus: $(cluster.prometheus.srcdir)prometheus
 	cp -r $(<) $(@)
 

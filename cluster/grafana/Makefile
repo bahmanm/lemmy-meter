@@ -23,6 +23,12 @@ cluster.grafana.build : ;
 
 ####################################################################################################
 
+.PHONY : cluster.grafana.push
+
+cluster.grafana.push : ;
+
+####################################################################################################
+
 $(cluster.deploy-root)grafana: $(cluster.grafana.srcdir)grafana.db $(cluster.grafana.srcdir)grafana.ini
 	mkdir $(@) \
 	&& cp -r $(^) $(@)

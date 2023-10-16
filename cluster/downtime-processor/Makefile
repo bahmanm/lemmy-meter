@@ -15,15 +15,30 @@
 ####################################################################################################
 
 cluster.downtime-processor.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+cluster.downtime-processor.tag := $(cluster.prefix)downtime-processor:$(cluster.tag)
 
 ####################################################################################################
 
 .PHONY : cluster.downtime-processor.build
+
+cluster.downtime-processor.build : private tag :=
 cluster.downtime-processor.build :
-	docker build \
-		--tag $(cluster)downtime-processor:$(cluster.tag) \
+	cd $(cluster.downtime-processor.srcdir) \
+	&& docker build \
+		--tag $(cluster.downtime-processor.tag) \
 		--file Dockerfile \
-		$(cluster.downtime-processor.srcdir)
+		$(cluster.downtime-processor.srcdir) \
+	&& yq \
+		-i \
+		'.services.planned-downtime.image = "$(cluster.downtime-processor.tag)"' \
+		$(cluster.srcdir)docker-compose.yml
+
+####################################################################################################
+
+.PHONY : cluster.downtime-processor.push
+
+cluster.downtime-processor.push :
+	docker push $(cluster.downtime-processor.tag)
 
 ####################################################################################################
 

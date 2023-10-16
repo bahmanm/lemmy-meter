@@ -23,6 +23,12 @@ cluster.json-exporter.build : ;
 
 ####################################################################################################
 
+.PHONY : cluster.json-exporter.push
+
+cluster.json-exporter.push : ;
+
+####################################################################################################
+
 $(cluster.deploy-root)json-exporter: $(cluster.json-exporter.srcdir)config.yml
 	mkdir $(@) \
 	&& cp -r $(^) $(@)

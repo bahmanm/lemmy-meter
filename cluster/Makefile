@@ -31,12 +31,6 @@ include $(cluster.services:%=$(cluster.srcdir)%/Makefile)
 
 ####################################################################################################
 
-.PHONY : cluster.build
-
-cluster.build : $(cluster.services:%=cluster.%.build)
-
-####################################################################################################
-
 $(cluster.deploy-root) :
 	mkdir -p $(@)
 
@@ -47,8 +41,50 @@ $(cluster.deploy-root)docker-compose.yml : $(cluster.srcdir)docker-compose.yml
 
 ####################################################################################################
 
+.PHONY : cluster.build
+
+cluster.build : $(cluster.services:%=cluster.%.build)
+
+####################################################################################################
+
+.PHONY : cluster.push
+
+cluster.push : $(cluster.services:%=cluster.%.push)
+
+####################################################################################################
+
 .PHONY : cluster.deploy
 
 cluster.deploy : | $(cluster.deploy-root)
 cluster.deploy : $(cluster.deploy-root)docker-compose.yml
 cluster.deploy : $(cluster.services:%=cluster.%.deploy)
+
+####################################################################################################
+
+.PHONY : cluster.up
+
+cluster.up : cluster.deploy
+	export UID \
+	&& export GID=$$(id -g) \
+	&& export CLUSTER_DEPLOY_ROOT=$(cluster.deploy-root) \
+	&& docker compose \
+		--file $(cluster.deploy-root)docker-compose.yml \
+		--project-name $(NAME) \
+		up \
+		--remove-orphans \
+		--pull always \
+		--detach
+
+####################################################################################################
+
+.PHONY : cluster.down
+
+cluster.down : cluster.down
+	export UID \
+	&& export GID=$$(id -g) \
+	&& export CLUSTER_DEPLOY_ROOT=$(cluster.deploy-root) \
+	&& docker compose \
+		--file $(cluster.deploy-root)docker-compose.yml \
+		--project-name $(NAME) \
+		down \
+		--remove-orphans
