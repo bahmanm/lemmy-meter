@@ -28,8 +28,8 @@ export DEPLOY_ROOT ?= $(build.dir)data/
 
 include bmakelib/bmakelib.mk
 
-.PHONY : $(ROOT)mk/ansible.mk
-include $(ROOT)mk/ansible.mk
+.PHONY : $(ROOT)ansible/Makefile
+include $(ROOT)ansible/Makefile
 
 .PHONY : $(ROOT)mk/target-instances.mk
 include $(ROOT)mk/target-instances.mk
