@@ -102,6 +102,7 @@ package : clean cluster.deploy
 
 .PHONY : deploy
 
+deploy : deploy-package := $(build.dir)$(NAME).tar.gz
 deploy : $(ansible.playbook.deploy-remote)
 
 ####################################################################################################
