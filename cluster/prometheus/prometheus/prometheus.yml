@@ -110,7 +110,7 @@ scrape_configs:
 
   ##################################################################################################
 
-  - job_name: planned_downtime_in_progress
+  - job_name: scheduled_downtime_in_progress
     scrape_interval: 1m
     metrics_path: /probe
     params:
@@ -118,7 +118,7 @@ scrape_configs:
         - default
     static_configs:
       - targets:
-          - http://downtime-processor:6060/planned-downtime-in-progress.json
+          - http://scheduled-downtime:6060/planned-downtime-in-progress.json
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
@@ -131,8 +131,8 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets:
-          - blackbox_exporter:9115
-          - planned_downtime:6060
-          - json_exporter:7979
+          - blackbox-exporter:9115
+          - scheduled-downtime:6060
+          - json-exporter:7979
           - grafana:3000
           - prometheus:9090
