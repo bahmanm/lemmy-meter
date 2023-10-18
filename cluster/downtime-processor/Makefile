@@ -30,7 +30,7 @@ cluster.downtime-processor.build :
 		$(cluster.downtime-processor.srcdir) \
 	&& yq \
 		-i \
-		'.services.planned-downtime.image = "$(cluster.downtime-processor.tag)"' \
+		'.services.scheduled-downtime.image = "$(cluster.downtime-processor.tag)"' \
 		$(cluster.srcdir)docker-compose.yml
 
 ####################################################################################################
