@@ -16,6 +16,7 @@
 
 cluster.downtime-processor.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 cluster.downtime-processor.tag := $(cluster.prefix)downtime-processor:$(cluster.tag)
+cluster.downtime-processor.files := downtime-processor.pl scheduled-downtime-schema.json scrape-targets.txt
 
 ####################################################################################################
 
@@ -30,7 +31,7 @@ cluster.downtime-processor.build :
 		$(cluster.downtime-processor.srcdir) \
 	&& yq \
 		-i \
-		'.services.scheduled-downtime.image = "$(cluster.downtime-processor.tag)"' \
+		'.services.downtime-processor.image = "$(cluster.downtime-processor.tag)"' \
 		$(cluster.srcdir)docker-compose.yml
 
 ####################################################################################################
@@ -42,9 +43,9 @@ cluster.downtime-processor.push :
 
 ####################################################################################################
 
-$(cluster.deploy-root)downtime-processor: $(cluster.downtime-processor.srcdir)downtime-processor.pl
+$(cluster.deploy-root)downtime-processor: $(cluster.downtime-processor.files:%=$(cluster.downtime-processor.srcdir)%)
 	mkdir $(@) \
-	&& cp -r $(<) $(@)
+	&& cp -r $(^) $(@)
 
 ####################################################################################################
 

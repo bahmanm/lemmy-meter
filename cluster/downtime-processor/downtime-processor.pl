@@ -5,6 +5,7 @@ use warnings ;
 use diagnostics ;
 use utf8 ;
 use feature ':5.38' ;
+use feature qw(try) ;
 
 use Data::Dump qw(dump) ;
 
@@ -17,6 +18,7 @@ local $ENV{TZ} = 'UTC' ;
   package LmDP ;
 
   use POSIX qw(strftime) ;
+  use Log::Log4perl ;
 
   use constant {
     TRUE       => 1,
@@ -29,12 +31,24 @@ local $ENV{TZ} = 'UTC' ;
     DEFAULT_SCHEDULED_DOWNTIME_SCHMEA_LOCATION => './scheduled-downtime-schema.json',
   } ;
 
+  my $log4perl_conf = q(
+    log4perl.rootLogger=DEBUG, Screen
+    log4perl.appender.Screen = Log::Log4perl::Appender::Screen
+    log4perl.appender.Screen.layout = PatternLayout
+    log4perl.appender.Screen.layout.ConversionPattern = [%r] %F %L %c - %m%n
+  ) ;
+
+  Log::Log4perl::init ( \$log4perl_conf ) ;
+
   our @now    = localtime () ;
   our $now_ts = strftime ( '%Y-%m-%d %H:%M', @now ) . ':00' ;
   our $json_schema_path =
     ( $ENV->{LMDP_JSON_SCHEMA} or DEFAULT_SCHEDULED_DOWNTIME_SCHMEA_LOCATION ) ;
   our $json_validator      = JSON::Validator->new->schema ( $json_schema_path ) ;
   our $scrape_targets_path = ( $ENV->{LMDP_SCRAPE_TARGETS} or DEFAULT_SCRAPE_TARGETS_LOCATION ) ;
+
+  our $logger = Log::Log4perl->get_logger ( 'LmDP' ) ;
+
 }
 
 ####################################################################################################
@@ -137,6 +151,10 @@ local $ENV{TZ} = 'UTC' ;
   has 'rows' => ( is => 'rw', isa => 'ArrayRef[LmDP::Schedule]', default => sub { [] } ) ;
 
   sub of_text ( $text ) {
+    if ( !$text ) {
+      $LmDP::logger->error ( "Attempting to load from an empty text." ) ;
+      return undef ;
+    }
     my $result = LmDP::Csv->new () ;
 
     my @raw_lines      = split ( /\r?\n/, $text ) ;
@@ -160,6 +178,7 @@ local $ENV{TZ} = 'UTC' ;
       ) ;
       push ( @{ $result->rows }, $row ) if $row->is_valid () ;
     }
+    $LmDP::logger->debug ( "Loaded $#{ $result->rows } rows from CSV." ) ;
     return $result ;
   }
 }
@@ -262,6 +281,10 @@ local $ENV{TZ} = 'UTC' ;
   has 'schedules' => ( is => 'rw', isa => 'ArrayRef[LmDP::Schedule]' ) ;
 
   sub of_text ( $text, $target ) {
+    if ( !$text ) {
+      $LmDP::logger->error ( "Attempting to load from an empty text." ) ;
+      return undef ;
+    }
     my $result = LmDP::Json->new ( { text => $text, schedules => [] } ) ;
     my $json   = decode_json ( $text ) ;
     my @errors = $LmDP::json_validator->validate ( $json ) ;
@@ -275,6 +298,7 @@ local $ENV{TZ} = 'UTC' ;
       my @schedules = _records_from ( $json, $target ) ;
       $result->schedules ( \@schedules ) ;
     }
+    $LmDP::logger->debug ( "Loaded $#{ $result->schedules } records from JSON." ) ;
     return $result ;
   }
 
@@ -313,6 +337,7 @@ local $ENV{TZ} = 'UTC' ;
   use Mojo::UserAgent ;
   use File::Slurper qw(read_lines) ;
   use Data::Dump    qw(dump) ;
+  use Mojo::Promise ;
 
   our @scrape_targets = do {
     my @lines = read_lines ( $LmDP::scrape_targets_path ) ;
@@ -327,8 +352,11 @@ local $ENV{TZ} = 'UTC' ;
   }
 
   sub _gsheet {
-    my $text       = _scrape ( LmDP::GSHEET_URL, "gsheet" ) ;
-    my $csv        = LmDP::Csv::of_text ( $text ) ;
+    my $text = _scrape ( LmDP::GSHEET_URL, "gsheet" ) ;
+    my $csv  = LmDP::Csv::of_text ( $text ) ;
+    if ( !$csv ) {
+      return () ;
+    }
     my @occurences = () ;
     foreach my $schedule ( @{ $csv->rows } ) {
       if ( $schedule->is_valid ) {
@@ -343,6 +371,7 @@ local $ENV{TZ} = 'UTC' ;
 
   sub _json_all {
     my @occurences = () ;
+    $LmDP::logger->info ( "Attempting scraping off " . ( $#scrape_targets + 1 ) . " targets." ) ;
     foreach my $target ( @scrape_targets ) {
       push ( @occurences, _json ( $target ) ) ;
     }
@@ -352,6 +381,7 @@ local $ENV{TZ} = 'UTC' ;
   sub _json ( $lemmy_instance ) {
     my $text = _scrape ( "$lemmy_instance/scheduled-downtime.json", $lemmy_instance ) ;
     my $json = LmDP::Json::of_text ( $text, $lemmy_instance ) ;
+    return () if !$json ;
     return _active_occurences ( @{ $json->schedules } ) ;
   }
 
@@ -369,22 +399,25 @@ local $ENV{TZ} = 'UTC' ;
   }
 
   sub _scrape ( $url, $target ) {
-    my $ua = Mojo::UserAgent->new ;
-    $ua->max_redirects ( 2 ) ;
+    $LmDP::logger->debug ( "Attempting scraping off $url w/ target being $target." ) ;
     try {
+      my $ua   = Mojo::UserAgent->new->max_redirects ( 3 ) ;
       my $resp = $ua->get ( $url )->result ;
-      if ( $resp->is_success ) {
+      if ( $resp && $resp->is_success ) {
+        $LmDP::logger->debug                ( "Successful HTTP request to $url" ) ;
         $LmDP::Metrics::counter_scrape->inc ( { target => $target, result => "success" } ) ;
         return $resp->body ;
       }
       else {
+        $LmDP::logger->debug                ( "Failed HTTP request to $url" ) ;
         $LmDP::Metrics::counter_scrape->inc ( { target => $target, result => "error" } ) ;
-        return '' ;
+        undef ;
       }
     }
-    catch {
-      warn "Caught error: $_" ;
+    catch ( $err ) {
+      $LmDP::logger->error                ( "Failed to scrape off $url: $err" ) ;
       $LmDP::Metrics::counter_scrape->inc ( { target => $target, result => "error" } ) ;
+      return undef ;
     }
   }
 }
@@ -399,6 +432,7 @@ local $ENV{TZ} = 'UTC' ;
   package LmDP::Web ;
 
   use Mojolicious::Lite ;
+  use Data::UUID ;
 
   get '/metrics' => sub ( $c ) {
     $c->render ( text => $LmDP::Metrics::prom->render ) ;
@@ -407,11 +441,18 @@ local $ENV{TZ} = 'UTC' ;
   get '/scheduled-downtime-in-progress.json' => sub ( $c ) {
     $LmDP::Metrics::counter_http_requests->inc ;
     my @instances = map { { lemmy_instance => $_->lemmy_instance } } LmDP::Scrape::scrape () ;
-    my $resp      = { planned_downtime => \@instances } ;
+    $LmDP::logger->info ( "There are $#instances instances undergoing scheduled downtime." ) ;
+    my $resp = { planned_downtime => \@instances } ;
     $c->render ( json => $resp ) ;
   } ;
+
+  our $ug   = Data::UUID->new ;
+  our $uuid = $ug->create ;
+
+  app->secrets ( [ $ug->to_string ( $uuid ) ] ) ;
 }
 
 ####################################################################################################
 
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running ;
 LmDP::Web::app->start ;

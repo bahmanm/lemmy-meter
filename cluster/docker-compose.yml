@@ -56,20 +56,24 @@ services:
       - "7979:7979"
     user: "${UID}:${GID}"
     restart: always
-  scheduled-downtime:
-    image: "bahmanm/lemmy-meter.downtime-processor:48add13"
+  downtime-processor:
+    image: "bahmanm/lemmy-meter.downtime-processor:7c849f0"
     entrypoint:
-      - "/usr/bin/downtime-processor.pl"
+      - "/opt/downtime-processor/downtime-processor.pl"
     command:
       - "prefork"
       - "-m"
-      - "production"
+      - "development"
       - "-l"
       - "http://*:6060"
     ports:
       - "6060:6060"
     volumes:
-      - "${CLUSTER_DEPLOY_ROOT}/downtime-processor/downtime-processor.pl:/usr/bin/downtime-processor.pl"
+      - "${CLUSTER_DEPLOY_ROOT}/downtime-processor/:/opt/downtime-processor"
+    working_dir: "/opt/downtime-processor"
+    environment:
+      - LMDP_JSON_SCHEMA=/opt/downtime-processor/scheduled-downtime-schema.json
+      - LMDP_SCRAPE_TARGETS=/opt/downtime-processor/scrape-targets.txt
     user: "${UID}:${GID}"
     restart: always
 volumes:
