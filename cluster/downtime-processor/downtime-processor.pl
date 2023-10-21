@@ -21,15 +21,15 @@ local $ENV{TZ} = 'UTC' ;
   use Log::Log4perl ;
 
   use constant {
-    TRUE       => 1,
-    FALSE      => 0,
-    GSHEET_URL =>
+    TRUE               => 1,
+    FALSE              => 0,
+    DEFAULT_GSHEET_URL =>
 'https://docs.google.com/spreadsheets/d/1KS3pMzrkW4888LbtqoGR5xylLCfYfkeHrSyMHIIvAfg/export?exportFormat=csv',
-    GSHEET_HEADER_ROWS                         => 12,
-    TIMESTAMP_FORMAT                           => '%Y-%m-%d %H:%M:%S',
-    DEFAULT_SCRAPE_TARGETS_LOCATION            => './scrape-targets.txt',
-    DEFAULT_SCHEDULED_DOWNTIME_SCHMEA_LOCATION => './scheduled-downtime-schema.json',
-    DEFAULT_LOG_LEVEL                          => 'WARN'
+    DEFAULT_GSHEET_HEADER_ROWS      => 12,
+    TIMESTAMP_FORMAT                => '%Y-%m-%d %H:%M:%S',
+    DEFAULT_SCRAPE_TARGETS_LOCATION => './scrape-targets.txt',
+    DEFAULT_SCHEMA_LOCATION         => './scheduled-downtime-schema.json',
+    DEFAULT_LOG_LEVEL               => 'WARN'
   } ;
 
   my $log4perl_conf = q(
@@ -42,10 +42,11 @@ local $ENV{TZ} = 'UTC' ;
   our @now    = localtime () ;
   our $now_ts = strftime ( '%Y-%m-%d %H:%M', @now ) . ':00' ;
 
-  our $json_schema_path =
-    ( $ENV{LMDP_JSON_SCHEMA} or DEFAULT_SCHEDULED_DOWNTIME_SCHMEA_LOCATION ) ;
+  our $json_schema_path    = ( $ENV{LMDP_JSON_SCHEMA}    or DEFAULT_SCHEMA_LOCATION ) ;
   our $scrape_targets_path = ( $ENV{LMDP_SCRAPE_TARGETS} or DEFAULT_SCRAPE_TARGETS_LOCATION ) ;
   our $log_level           = ( $ENV{LMDP_LOG_LEVEL}      or DEFAULT_LOG_LEVEL ) ;
+  our $gsheet_url          = ( $ENV{LMDP_GSHEET_URL}     or DEFAULT_GSHEET_URL ) ;
+  our $ghseet_header_rows  = ( $ENV{LMDP_GSHEET_HEADER_ROWS} or DEFAULT_GSHEET_HEADER_ROWS ) ;
 
   our $json_validator = JSON::Validator->new->schema ( $json_schema_path ) ;
 
@@ -161,7 +162,7 @@ local $ENV{TZ} = 'UTC' ;
     my $result = LmDP::Csv->new () ;
 
     my @raw_lines      = split ( /\r?\n/, $text ) ;
-    my $text_no_header = join ( "\n", @raw_lines[ LmDP::GSHEET_HEADER_ROWS .. $#raw_lines ] ) ;
+    my $text_no_header = join ( "\n", @raw_lines[ $LmDP::ghseet_header_rows .. $#raw_lines ] ) ;
     $result->text ( $text_no_header ) ;
 
     my $csv = Text::CSV->new ( { diag_verbose => 1 } ) ;
@@ -367,7 +368,7 @@ local $ENV{TZ} = 'UTC' ;
   }
 
   sub _gsheet {
-    my $text = _scrape ( LmDP::GSHEET_URL, "gsheet" ) ;
+    my $text = _scrape ( LmDP::DEFAULT_GSHEET_URL, "gsheet" ) ;
     my $csv  = LmDP::Csv::of_text ( $text ) ;
     if ( !$csv ) {
       return () ;

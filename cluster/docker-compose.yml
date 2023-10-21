@@ -75,6 +75,8 @@ services:
       - LMDP_JSON_SCHEMA=/opt/downtime-processor/scheduled-downtime-schema.json
       - LMDP_SCRAPE_TARGETS=/opt/downtime-processor/scrape-targets.txt
       - LMDP_LOG_LEVEL=DEBUG
+      - LMDP_GOOGLE_SHEET=https://docs.google.com/spreadsheets/d/1KS3pMzrkW4888LbtqoGR5xylLCfYfkeHrSyMHIIvAfg/export?exportFormat=csv
+      - LMDP_GSHEET_HEADER_ROWS=12
     user: "${UID}:${GID}"
     restart: always
   nginx:
