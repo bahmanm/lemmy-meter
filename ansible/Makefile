@@ -23,7 +23,7 @@ ansible.venv.activate := source $(ansible.venv)bin/activate
 
 ansible.playbook.deploy-remote := $(ansible.root)playbooks/deploy-remote.yml
 ansible.playbook.reset-grafana-password := $(ansible.root)playbooks/reset-grafana-password.yml
-ansible.playbook.setup-server := $(ansible.root)playbooks/setup-server.yml
+ansible.playbook.setup-server := $(ansible.root)playbooks/setup_server/setup_server.yml
 
 ####################################################################################################
 
