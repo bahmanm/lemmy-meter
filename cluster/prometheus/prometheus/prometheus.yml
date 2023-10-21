@@ -118,7 +118,7 @@ scrape_configs:
         - default
     static_configs:
       - targets:
-          - http://downtime-processor:6060/planned-downtime-in-progress.json
+          - http://downtime-processor:6060/scheduled-downtime-in-progress.json
     relabel_configs:
       - source_labels: [__address__]
         target_label: __param_target
