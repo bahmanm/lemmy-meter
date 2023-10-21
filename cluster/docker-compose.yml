@@ -57,7 +57,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:4722b00"
+    image: "bahmanm/lemmy-meter.downtime-processor:3ec741d"
     entrypoint:
       - "/opt/downtime-processor/downtime-processor.pl"
     command:
