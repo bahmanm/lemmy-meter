@@ -348,7 +348,17 @@ local $ENV{TZ} = 'UTC' ;
     my @occurences = () ;
     push ( @occurences, _gsheet () ) ;
     push ( @occurences, _json_all () ) ;
-    return @occurences ;
+
+    my %instances = () ;
+    my @result    = () ;
+    foreach my $occ ( @occurences ) {
+      if ( !$instances{ $occ->lemmy_instance } ) {
+        $instances{ $occ->lemmy_instance } = LmDP::TRUE ;
+        push ( @result, $occ ) ;
+      }
+    }
+
+    return @result ;
   }
 
   sub _gsheet {
