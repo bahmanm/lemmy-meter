@@ -57,13 +57,13 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:9ceb6a2"
+    image: "bahmanm/lemmy-meter.downtime-processor:5dcd940"
     entrypoint:
       - "/opt/downtime-processor/downtime-processor.pl"
     command:
       - "prefork"
       - "-m"
-      - "development"
+      - "production"
       - "-l"
       - "http://*:6060"
     ports:
