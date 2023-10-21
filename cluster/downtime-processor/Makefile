@@ -44,7 +44,7 @@ cluster.downtime-processor.push :
 ####################################################################################################
 
 $(cluster.deploy-root)downtime-processor: $(cluster.downtime-processor.files:%=$(cluster.downtime-processor.srcdir)%)
-	mkdir $(@) \
+	mkdir -p $(@) \
 	&& cp -r $(^) $(@)
 
 ####################################################################################################
