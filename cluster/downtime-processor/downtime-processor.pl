@@ -29,26 +29,29 @@ local $ENV{TZ} = 'UTC' ;
     TIMESTAMP_FORMAT                           => '%Y-%m-%d %H:%M:%S',
     DEFAULT_SCRAPE_TARGETS_LOCATION            => './scrape-targets.txt',
     DEFAULT_SCHEDULED_DOWNTIME_SCHMEA_LOCATION => './scheduled-downtime-schema.json',
+    DEFAULT_LOG_LEVEL                          => 'WARN'
   } ;
 
   my $log4perl_conf = q(
-    log4perl.rootLogger=DEBUG, Screen
+    log4perl.rootLogger=DEBUG,Screen
     log4perl.appender.Screen = Log::Log4perl::Appender::Screen
     log4perl.appender.Screen.layout = PatternLayout
     log4perl.appender.Screen.layout.ConversionPattern = [%r] %F %L %c - %m%n
   ) ;
 
-  Log::Log4perl::init ( \$log4perl_conf ) ;
-
   our @now    = localtime () ;
   our $now_ts = strftime ( '%Y-%m-%d %H:%M', @now ) . ':00' ;
+
   our $json_schema_path =
-    ( $ENV->{LMDP_JSON_SCHEMA} or DEFAULT_SCHEDULED_DOWNTIME_SCHMEA_LOCATION ) ;
-  our $json_validator      = JSON::Validator->new->schema ( $json_schema_path ) ;
-  our $scrape_targets_path = ( $ENV->{LMDP_SCRAPE_TARGETS} or DEFAULT_SCRAPE_TARGETS_LOCATION ) ;
+    ( $ENV{LMDP_JSON_SCHEMA} or DEFAULT_SCHEDULED_DOWNTIME_SCHMEA_LOCATION ) ;
+  our $scrape_targets_path = ( $ENV{LMDP_SCRAPE_TARGETS} or DEFAULT_SCRAPE_TARGETS_LOCATION ) ;
+  our $log_level           = ( $ENV{LMDP_LOG_LEVEL}      or DEFAULT_LOG_LEVEL ) ;
 
+  our $json_validator = JSON::Validator->new->schema ( $json_schema_path ) ;
+
+  Log::Log4perl::init ( \$log4perl_conf ) ;
   our $logger = Log::Log4perl->get_logger ( 'LmDP' ) ;
-
+  $logger->level ( Log::Log4perl::Level::to_priority ( $log_level ) ) ;
 }
 
 ####################################################################################################
@@ -186,7 +189,9 @@ local $ENV{TZ} = 'UTC' ;
 ####################################################################################################
 
 {
-
+  ####################
+  # Maps an LmDP::Schedule ot LmDP::NextOccurence
+  ####################
   package LmDP::ScheduleMapper ;
 
   require Schedule::Cron::Events ;
@@ -381,7 +386,7 @@ local $ENV{TZ} = 'UTC' ;
 
   sub _json_all {
     my @occurences = () ;
-    $LmDP::logger->info ( "Attempting scraping off " . ( $#scrape_targets + 1 ) . " targets." ) ;
+    $LmDP::logger->info ( "Attempting to scrape off " . ( $#scrape_targets + 1 ) . " targets." ) ;
     foreach my $target ( @scrape_targets ) {
       push ( @occurences, _json ( $target ) ) ;
     }
@@ -409,7 +414,7 @@ local $ENV{TZ} = 'UTC' ;
   }
 
   sub _scrape ( $url, $target ) {
-    $LmDP::logger->debug ( "Attempting scraping off $url w/ target being $target." ) ;
+    $LmDP::logger->debug ( "Attempting to scrape off $url w/ target being $target." ) ;
     try {
       my $ua   = Mojo::UserAgent->new->max_redirects ( 3 ) ;
       my $resp = $ua->get ( $url )->result ;
@@ -452,7 +457,7 @@ local $ENV{TZ} = 'UTC' ;
     $LmDP::Metrics::counter_http_requests->inc ;
     my @instances = map { { lemmy_instance => $_->lemmy_instance } } LmDP::Scrape::scrape () ;
     $LmDP::logger->info ( "There are $#instances instances undergoing scheduled downtime." ) ;
-    my $resp = { planned_downtime => \@instances } ;
+    my $resp = { scheduled_downtime => \@instances } ;
     $c->render ( json => $resp ) ;
   } ;
 
