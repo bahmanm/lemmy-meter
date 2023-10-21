@@ -18,7 +18,7 @@
 version: "3.8"
 services:
   prometheus:
-    image: prom/prometheus:v2.47.0
+    image: "prom/prometheus:v2.47.0"
     command:
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=60d"
@@ -30,7 +30,7 @@ services:
       - "prometheus-data:/prometheus"
     restart: always
   grafana:
-    image: grafana/grafana:9.4.14
+    image: "grafana/grafana:9.4.14"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.ini:/etc/grafana/grafana.ini"
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.db:/var/lib/grafana/grafana.db"
@@ -39,7 +39,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   blackbox-exporter:
-    image: prom/blackbox-exporter:v0.24.0
+    image: "prom/blackbox-exporter:v0.24.0"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/blackbox-exporter/config.yml:/etc/blackbox_exporter/config.yml"
     ports:
@@ -47,7 +47,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   json-exporter:
-    image: prometheuscommunity/json-exporter:v0.6.0
+    image: "prometheuscommunity/json-exporter:v0.6.0"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/json-exporter/config.yml:/etc/json_exporter-config.yml"
     command:
@@ -57,7 +57,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:67262d9"
+    image: "bahmanm/lemmy-meter.downtime-processor:635d34c"
     entrypoint:
       - "/opt/downtime-processor/downtime-processor.pl"
     command:
@@ -76,6 +76,13 @@ services:
       - LMDP_SCRAPE_TARGETS=/opt/downtime-processor/scrape-targets.txt
       - LMDP_LOG_LEVEL=DEBUG
     user: "${UID}:${GID}"
+    restart: always
+  nginx:
+    image: nginx:1.25
+    ports:
+      - "8000:80"
+    volumes:
+      - "${CLUSTER_DEPLOY_ROOT}/nginx/:/usr/share/nginx/html:ro"
     restart: always
 volumes:
   prometheus-data:

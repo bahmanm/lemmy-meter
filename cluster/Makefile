@@ -21,7 +21,7 @@ export cluster.deploy-root := $(DEPLOY_ROOT)lemmy-meter/
 
 ####################################################################################################
 
-cluster.services := prometheus grafana blackbox-exporter json-exporter downtime-processor
+cluster.services := prometheus grafana blackbox-exporter json-exporter downtime-processor nginx
 
 ####################################################################################################
 
