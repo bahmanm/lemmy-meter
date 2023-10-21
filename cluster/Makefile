@@ -86,7 +86,7 @@ cluster.up : cluster.deploy
 
 .PHONY : cluster.down
 
-cluster.down : cluster.down
+cluster.down :
 	$(cluster.docker-compose) \
 		down \
 		--remove-orphans
