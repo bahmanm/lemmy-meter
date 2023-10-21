@@ -57,7 +57,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:7c849f0"
+    image: "bahmanm/lemmy-meter.downtime-processor:67262d9"
     entrypoint:
       - "/opt/downtime-processor/downtime-processor.pl"
     command:
@@ -74,6 +74,7 @@ services:
     environment:
       - LMDP_JSON_SCHEMA=/opt/downtime-processor/scheduled-downtime-schema.json
       - LMDP_SCRAPE_TARGETS=/opt/downtime-processor/scrape-targets.txt
+      - LMDP_LOG_LEVEL=DEBUG
     user: "${UID}:${GID}"
     restart: always
 volumes:
