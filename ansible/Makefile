@@ -74,13 +74,14 @@ $(ansible.playbook.setup-server) : bmakelib.error-if-blank( ansible.lemmy-meter-
 $(ansible.playbook.setup-server) : bmakelib.default-if-blank( ansible.ssh.authorized_key,~/.ssh/id_rsa.pub )
 $(ansible.playbook.setup-server) : | $(ansible.venv)
 	$(ansible.venv.activate) \
-	&& hashed_password=$$(python -c \
+	&& export hashed_password=$$(python -c \
 		"from passlib.hash import sha512_crypt; print(sha512_crypt.using(rounds=5000).hash('$(ansible.lemmy-meter-password)'))") \
-	ansible-playbook \
+	&& ansible-playbook \
 		$(ansible.verbosity) \
 		-i '$(ansible.lemmy-meter-server),' \
+		-e "setup_server_fqdn=$(ansible.fqdn)" \
 		-e "setup_server_hashed_password=$${hashed_password}" \
-		-e "setup_server_ssh_public_key=$$(<$(ansible.ssh.authorized_key))" \
+		-e "setup_server_ssh_public_key='$(ansible.ssh.authorized_key)'" \
 		--become-user $(ansible.user) \
-		--ask-pass \
+		--ask-become-pass \
 		$(@)

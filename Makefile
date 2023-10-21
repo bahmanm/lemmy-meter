@@ -121,3 +121,12 @@ deploy-vagrant : ansible.fqdn := test.lemmy-meter.info
 deploy-vagrant : vagrant.up
 deploy-vagrant : ansible.lemmy-meter-server := 192.168.33.10
 deploy-vagrant : deploy
+
+
+####################################################################################################
+
+.PHONY : setup-server
+
+setup-server : bmakelib.error-if-blank( ansible.fqdn )
+setup-server : ansible.lemmy-meter-server := $(ansible.fqdn)
+setup-server : $(ansible.playbook.setup-server)
