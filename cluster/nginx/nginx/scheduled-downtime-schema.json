@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lemmy-meter.info/scheduled-downtime-schema.json",
+  "title": "Scheduled Downtime",
+  "description": "Lemmy instance scheduled downtime",
+  "type": "object",
+  "properties": {
+    "schedule": {
+      "type": "object",
+      "properties": {
+        "once": {
+          "description": "One off downtime periods.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "when": {
+                "description": "UTC Timestamp in YYYY-mm-ddTHH:MM format. ",
+                "type": "string",
+                "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}$"
+              },
+              "duration": {
+                "description": "Duration in minutes.",
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        },
+        "recurring": {
+          "description": "Recurring downtime periods.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "cron": {
+                "description": "UTC Cron schedule.  See https://crontab.guru",
+                "type": "string",
+                "pattern": "^((([0-9]+,)+[0-9]+|([0-9]+[/-][0-9]+)|[0-9]+|.*) ?){5,7}$"
+              },
+              "duration": {
+                "description": "Duration in minutes.",
+                "type": "integer",
+                "minimum": 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

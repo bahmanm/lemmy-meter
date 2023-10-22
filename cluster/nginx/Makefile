@@ -14,27 +14,27 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
-cluster.json-exporter.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+cluster.nginx.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 ####################################################################################################
 
-.PHONY : cluster.json-exporter.build
-cluster.json-exporter.build : ;
+.PHONY : cluster.nginx.build
+
+cluster.nginx.build : ;
 
 ####################################################################################################
 
-.PHONY : cluster.json-exporter.push
+.PHONY : cluster.nginx.push
 
-cluster.json-exporter.push : ;
-
-####################################################################################################
-
-$(cluster.deploy-root)json-exporter: $(cluster.json-exporter.srcdir)config.yml
-	mkdir -p $(@) \
-	&& cp -r $(^) $(@)
+cluster.nginx.push : ;
 
 ####################################################################################################
 
-.PHONY : cluster.json-exporter.deploy
+$(cluster.deploy-root)nginx: $(cluster.nginx.srcdir)nginx
+	cp -r $(<) $(@)
 
-cluster.json-exporter.deploy : $(cluster.deploy-root)json-exporter
+####################################################################################################
+
+.PHONY : cluster.nginx.deploy
+
+cluster.nginx.deploy : $(cluster.deploy-root)nginx

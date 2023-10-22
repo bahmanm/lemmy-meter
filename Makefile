@@ -82,7 +82,7 @@ down : lemmy-meter.down
 .PHONY : package
 
 package : package.tar := $(build.dir)$(NAME).tar
-package : clean cluster.deploy
+package : cluster.deploy
 	tar \
 		-C $(DEPLOY_ROOT)$(NAME)/ \
 		--create \
@@ -103,7 +103,7 @@ package : clean cluster.deploy
 .PHONY : deploy
 
 deploy : deploy-package := $(build.dir)$(NAME).tar.gz
-deploy : $(ansible.playbook.deploy-remote)
+deploy : package $(ansible.playbook.deploy-remote)
 
 ####################################################################################################
 
@@ -115,9 +115,20 @@ reset-grafana-password : $(ansible.playbook.reset-grafana-password)
 
 .PHONY : deploy-vagrant
 
+deploy-vagrant : clean
 deploy-vagrant : export ANSIBLE_HOST_KEY_CHECKING=False
 deploy-vagrant : ansible.lemmy-meter-password := lemmy-meter
 deploy-vagrant : ansible.fqdn := test.lemmy-meter.info
 deploy-vagrant : vagrant.up
-deploy-vagrant : ansible.lemmy-meter-server := 192.168.33.10
+deploy-vagrant : ansible.lemmy-meter-server := test.lemmy-meter.info
+deploy-vagrant : cluster.env := staging
 deploy-vagrant : deploy
+
+
+####################################################################################################
+
+.PHONY : setup-server
+
+setup-server : bmakelib.error-if-blank( ansible.fqdn )
+setup-server : ansible.lemmy-meter-server := $(ansible.fqdn)
+setup-server : $(ansible.playbook.setup-server)

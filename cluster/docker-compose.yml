@@ -18,7 +18,7 @@
 version: "3.8"
 services:
   prometheus:
-    image: prom/prometheus:v2.47.0
+    image: "prom/prometheus:v2.47.0"
     command:
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=60d"
@@ -30,7 +30,7 @@ services:
       - "prometheus-data:/prometheus"
     restart: always
   grafana:
-    image: grafana/grafana:9.4.14
+    image: "grafana/grafana:9.4.14"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.ini:/etc/grafana/grafana.ini"
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.db:/var/lib/grafana/grafana.db"
@@ -39,7 +39,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   blackbox-exporter:
-    image: prom/blackbox-exporter:v0.24.0
+    image: "prom/blackbox-exporter:v0.24.0"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/blackbox-exporter/config.yml:/etc/blackbox_exporter/config.yml"
     ports:
@@ -47,7 +47,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   json-exporter:
-    image: prometheuscommunity/json-exporter:v0.6.0
+    image: "prometheuscommunity/json-exporter:v0.6.0"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/json-exporter/config.yml:/etc/json_exporter-config.yml"
     command:
@@ -56,21 +56,35 @@ services:
       - "7979:7979"
     user: "${UID}:${GID}"
     restart: always
-  scheduled-downtime:
-    image: "bahmanm/lemmy-meter.downtime-processor:48add13"
+  downtime-processor:
+    image: "bahmanm/lemmy-meter.downtime-processor:3a7b7bc"
     entrypoint:
-      - "/usr/bin/downtime-processor.pl"
+      - "/opt/downtime-processor/downtime-processor.pl"
     command:
       - "prefork"
       - "-m"
-      - "production"
+      - "${LMDP_MODE}"
       - "-l"
       - "http://*:6060"
     ports:
       - "6060:6060"
     volumes:
-      - "${CLUSTER_DEPLOY_ROOT}/downtime-processor/downtime-processor.pl:/usr/bin/downtime-processor.pl"
+      - "${CLUSTER_DEPLOY_ROOT}/downtime-processor/:/opt/downtime-processor"
+    working_dir: "/opt/downtime-processor"
+    environment:
+      - LMDP_JSON_SCHEMA=/opt/downtime-processor/scheduled-downtime-schema.json
+      - LMDP_SCRAPE_TARGETS=/opt/downtime-processor/scrape-targets.txt
+      - LMDP_LOG_LEVEL=${LMDP_LOG_LEVEL}
+      - LMDP_GSHEET_URL=${LMDP_GSHEET_URL}
+      - LMDP_GSHEET_HEADER_ROWS=${LMDP_GSHEET_HEADER_ROWS}
     user: "${UID}:${GID}"
+    restart: always
+  nginx:
+    image: nginx:1.25
+    ports:
+      - "8000:80"
+    volumes:
+      - "${CLUSTER_DEPLOY_ROOT}/nginx/:/usr/share/nginx/html:ro"
     restart: always
 volumes:
   prometheus-data:

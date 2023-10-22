@@ -14,7 +14,7 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
-ansible.root := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+export ansible.root := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 ansible.venv := $(build.dir)ansible-venv/
 ansible.requirements := $(ansible.root)requirements.txt
 ansible.venv.activate := source $(ansible.venv)bin/activate
@@ -23,7 +23,7 @@ ansible.venv.activate := source $(ansible.venv)bin/activate
 
 ansible.playbook.deploy-remote := $(ansible.root)playbooks/deploy-remote.yml
 ansible.playbook.reset-grafana-password := $(ansible.root)playbooks/reset-grafana-password.yml
-ansible.playbook.setup-server := $(ansible.root)playbooks/setup-server.yml
+ansible.playbook.setup-server := $(ansible.root)playbooks/setup_server/setup_server.yml
 
 ####################################################################################################
 
@@ -40,14 +40,15 @@ $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.app-root,
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.deploy-root,/home/lemmy-meter/var )
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.verbosity,-v )
 $(ansible.playbook.deploy-remote) : bmakelib.error-if-blank( deploy-package )
-$(ansible.playbook.deploy-remote) : \
-		| $(ansible.venv)
+$(ansible.playbook.deploy-remote) : | $(ansible.venv)
 	$(ansible.venv.activate) \
 	&& ansible-playbook \
 		$(ansible.verbosity) \
 		-i '$(ansible.lemmy-meter-server),' \
 		-e 'ansible_user=lemmy-meter' \
 		-e 'lemmy_meter_archive_path=$(deploy-package)' \
+		-e 'lemmy_meter_command_path=$(src.dir)bin/lemmy-meter' \
+		-e 'lemmy_meter_cluster_env=$(cluster.env)' \
 		$(@)
 
 ####################################################################################################
@@ -74,13 +75,14 @@ $(ansible.playbook.setup-server) : bmakelib.error-if-blank( ansible.lemmy-meter-
 $(ansible.playbook.setup-server) : bmakelib.default-if-blank( ansible.ssh.authorized_key,~/.ssh/id_rsa.pub )
 $(ansible.playbook.setup-server) : | $(ansible.venv)
 	$(ansible.venv.activate) \
-	&& hashed_password=$$(python -c \
+	&& export hashed_password=$$(python -c \
 		"from passlib.hash import sha512_crypt; print(sha512_crypt.using(rounds=5000).hash('$(ansible.lemmy-meter-password)'))") \
-	ansible-playbook \
+	&& ansible-playbook \
 		$(ansible.verbosity) \
 		-i '$(ansible.lemmy-meter-server),' \
+		-e "setup_server_fqdn=$(ansible.fqdn)" \
 		-e "setup_server_hashed_password=$${hashed_password}" \
-		-e "setup_server_ssh_public_key=$$(<$(ansible.ssh.authorized_key))" \
+		-e "setup_server_ssh_public_key='$(ansible.ssh.authorized_key)'" \
 		--become-user $(ansible.user) \
-		--ask-pass \
+		--ask-become-pass \
 		$(@)

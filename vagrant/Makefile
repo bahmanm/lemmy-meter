@@ -43,7 +43,7 @@ vagrant.up : | $(ansible.venv)
 
 ####################################################################################################
 
-.PHONY : vagrant.desktroy
+.PHONY : vagrant.destroy
 
 vagrant.destroy : bmakelib.default-if-blank( vagrant.options,-f )
 	cd $(vagrant.root) \

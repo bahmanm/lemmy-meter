@@ -14,46 +14,28 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
-cluster.downtime-processor.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
-cluster.downtime-processor.tag := $(cluster.prefix)downtime-processor:$(cluster.tag)
-cluster.downtime-processor.files := downtime-processor.pl scheduled-downtime-schema.json scrape-targets.txt
-cluster.downtime-processor.sources := $(cluster.downtime-processor.srcdir)downtime-processor.pl
+cluster.config.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 ####################################################################################################
 
-$(cluster.downtime-processor.srcdir)downtime-processor.pl :
-	perl -cW $(@)
+.PHONY : cluster.config.build
+
+cluster.config.build : ;
 
 ####################################################################################################
 
-.PHONY : cluster.downtime-processor.build
+.PHONY : cluster.config.push
 
-cluster.downtime-processor.build : $(cluster.downtime-processor.sources)
-	cd $(cluster.downtime-processor.srcdir) \
-	&& docker build \
-		--tag $(cluster.downtime-processor.tag) \
-		--file Dockerfile \
-		$(cluster.downtime-processor.srcdir) \
-	&& yq \
-		-i \
-		'.services.downtime-processor.image = "$(cluster.downtime-processor.tag)"' \
-		$(cluster.srcdir)docker-compose.yml
+cluster.config.push : ;
 
 ####################################################################################################
 
-.PHONY : cluster.downtime-processor.push
-
-cluster.downtime-processor.push :
-	docker push $(cluster.downtime-processor.tag)
-
-####################################################################################################
-
-$(cluster.deploy-root)downtime-processor: $(cluster.downtime-processor.files:%=$(cluster.downtime-processor.srcdir)%)
+$(cluster.deploy-root)config: $(wildcard $(cluster.config.srcdir)*.conf)
 	mkdir -p $(@) \
 	&& cp -r $(^) $(@)
 
 ####################################################################################################
 
-.PHONY : cluster.downtime-processor.deploy
+.PHONY : cluster.config.deploy
 
-cluster.downtime-processor.deploy : $(cluster.deploy-root)downtime-processor
+cluster.config.deploy : $(cluster.deploy-root)config
