@@ -67,7 +67,10 @@ cluster.push : $(cluster.services:%=cluster.%.push)
 
 .PHONY : cluster.deploy
 
-cluster.deploy : cluster.build cluster.push
+cluster.deploy : \
+		cluster.ensure-variables \
+		cluster.build \
+		cluster.push
 cluster.deploy : | $(cluster.deploy-root)
 cluster.deploy : $(cluster.deploy-root)docker-compose.yml
 cluster.deploy : $(cluster.services:%=cluster.%.deploy)
