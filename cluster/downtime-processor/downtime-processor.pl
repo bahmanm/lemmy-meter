@@ -368,7 +368,7 @@ local $ENV{TZ} = 'UTC' ;
   }
 
   sub _gsheet {
-    my $text = _scrape ( LmDP::DEFAULT_GSHEET_URL, "gsheet" ) ;
+    my $text = _scrape ( $LmDP::gsheet_url, "gsheet" ) ;
     my $csv  = LmDP::Csv::of_text ( $text ) ;
     if ( !$csv ) {
       return () ;
