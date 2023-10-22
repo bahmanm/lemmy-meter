@@ -373,16 +373,9 @@ local $ENV{TZ} = 'UTC' ;
     if ( !$csv ) {
       return () ;
     }
-    my @occurences = () ;
-    foreach my $schedule ( @{ $csv->rows } ) {
-      if ( $schedule->is_valid ) {
-        my @occs = LmDP::ScheduleMapper::to_NextOccurence ( $schedule ) ;
-        foreach my $occ ( @occs ) {
-          push ( @occurences, $occ ) if $occ->is_active ( $LmDP::now_ts ) ;
-        }
-      }
+    else {
+      return _active_occurences ( @{ $csv->rows } ) ;
     }
-    return @occurences ;
   }
 
   sub _json_all {
@@ -397,8 +390,12 @@ local $ENV{TZ} = 'UTC' ;
   sub _json ( $lemmy_instance ) {
     my $text = _scrape ( "$lemmy_instance/scheduled-downtime.json", $lemmy_instance ) ;
     my $json = LmDP::Json::of_text ( $text, $lemmy_instance ) ;
-    return () if !$json ;
-    return _active_occurences ( @{ $json->schedules } ) ;
+    if ( !$json ) {
+      return () ;
+    }
+    else {
+      return _active_occurences ( @{ $json->schedules } ) ;
+    }
   }
 
   sub _active_occurences ( @schedules ) {
@@ -407,7 +404,13 @@ local $ENV{TZ} = 'UTC' ;
       if ( $schedule->is_valid ) {
         my @occs = LmDP::ScheduleMapper::to_NextOccurence ( $schedule ) ;
         foreach my $occ ( @occs ) {
-          push ( @occurences, $occ ) if $occ->is_active ( $LmDP::now_ts ) ;
+          if ( $occ->is_active ( $LmDP::now_ts ) ) {
+            $LmDP::logger->debug ( "Identified active downtime. LmDP::Schedule is "
+                . Data::Dumper->Dump ( $schedule )
+                . " and LmDP::NextOccurence is "
+                . Data::Dumper->Dump ( $occ ) ) ;
+            push ( @occurences, $occ ) ;
+          }
         }
       }
     }
@@ -457,7 +460,8 @@ local $ENV{TZ} = 'UTC' ;
   get '/scheduled-downtime-in-progress.json' => sub ( $c ) {
     $LmDP::Metrics::counter_http_requests->inc ;
     my @instances = map { { lemmy_instance => $_->lemmy_instance } } LmDP::Scrape::scrape () ;
-    $LmDP::logger->info ( "There are $#instances instances undergoing scheduled downtime." ) ;
+    $LmDP::logger->info (
+      "There are " . $#instances + 1 . " instances undergoing scheduled downtime." ) ;
     my $resp = { scheduled_downtime => \@instances } ;
     $c->render ( json => $resp ) ;
   } ;
