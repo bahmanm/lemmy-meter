@@ -17,13 +17,18 @@
 cluster.downtime-processor.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 cluster.downtime-processor.tag := $(cluster.prefix)downtime-processor:$(cluster.tag)
 cluster.downtime-processor.files := downtime-processor.pl scheduled-downtime-schema.json scrape-targets.txt
+cluster.downtime-processor.sources := $(cluster.downtime-processor.srcdir)downtime-processor.pl
+
+####################################################################################################
+
+$(cluster.downtime-processor.srcdir)downtime-processor.pl :
+	perl -cW $(@)
 
 ####################################################################################################
 
 .PHONY : cluster.downtime-processor.build
 
-cluster.downtime-processor.build : private tag :=
-cluster.downtime-processor.build :
+cluster.downtime-processor.build : $(cluster.downtime-processor.sources)
 	cd $(cluster.downtime-processor.srcdir) \
 	&& docker build \
 		--tag $(cluster.downtime-processor.tag) \
