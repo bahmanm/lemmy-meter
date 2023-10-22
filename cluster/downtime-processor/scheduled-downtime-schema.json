@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://lemmy-meter.info/scheduled-downtime.schema.json",
-  "title": "Planned Downtime",
-  "description": "Lemmy instance planned/scheduled downtime",
+  "$id": "https://lemmy-meter.info/.metadata/scheduled-downtime-schema.json",
+  "title": "Scheduled Downtime",
+  "description": "Lemmy instance scheduled downtime",
   "type": "object",
   "properties": {
     "schedule": {
