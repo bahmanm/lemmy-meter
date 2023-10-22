@@ -15,7 +15,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision :ansible do |ansible|
     ansible.verbose = "vv"
-    ansible.playbook = "../ansible/playbooks/setup_server/setup_server.yml"
+    ansible.playbook = "#{ENV['ansible.root']}/playbooks/setup_server/setup_server.yml"
     ansible.compatibility_mode = "2.0"
     ansible.raw_arguments = Shellwords.shellsplit(ENV['ANSIBLE_ARGS']) if ENV['ANSIBLE_ARGS']
   end
