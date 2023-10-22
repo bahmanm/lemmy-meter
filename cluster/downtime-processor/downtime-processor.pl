@@ -5,7 +5,7 @@ use warnings ;
 use diagnostics ;
 use utf8 ;
 use feature ':5.38' ;
-use feature qw(try) ;
+use experimental qw(try) ;
 
 use Data::Dump qw(dump) ;
 
@@ -17,7 +17,6 @@ local $ENV{TZ} = 'UTC' ;
 
   package LmDP ;
 
-  use POSIX qw(strftime) ;
   use Log::Log4perl ;
 
   use constant {
@@ -39,9 +38,6 @@ local $ENV{TZ} = 'UTC' ;
     log4perl.appender.Screen.layout.ConversionPattern = [%r] %F %L %c - %m%n
   ) ;
 
-  our @now    = localtime () ;
-  our $now_ts = strftime ( '%Y-%m-%d %H:%M', @now ) . ':00' ;
-
   our $json_schema_path    = ( $ENV{LMDP_JSON_SCHEMA}    or DEFAULT_SCHEMA_LOCATION ) ;
   our $scrape_targets_path = ( $ENV{LMDP_SCRAPE_TARGETS} or DEFAULT_SCRAPE_TARGETS_LOCATION ) ;
   our $log_level           = ( $ENV{LMDP_LOG_LEVEL}      or DEFAULT_LOG_LEVEL ) ;
@@ -49,6 +45,7 @@ local $ENV{TZ} = 'UTC' ;
   our $ghseet_header_rows  = ( $ENV{LMDP_GSHEET_HEADER_ROWS} or DEFAULT_GSHEET_HEADER_ROWS ) ;
 
   our $json_validator = JSON::Validator->new->schema ( $json_schema_path ) ;
+  our ( @now, $now_ts ) = ( undef, undef ) ;
 
   Log::Log4perl::init ( \$log4perl_conf ) ;
   our $logger = Log::Log4perl->get_logger ( 'LmDP' ) ;
@@ -374,7 +371,7 @@ local $ENV{TZ} = 'UTC' ;
       return () ;
     }
     else {
-      return _active_occurences ( @{ $csv->rows } ) ;
+      return _active_occurences ( $csv->rows ) ;
     }
   }
 
@@ -394,21 +391,21 @@ local $ENV{TZ} = 'UTC' ;
       return () ;
     }
     else {
-      return _active_occurences ( @{ $json->schedules } ) ;
+      return _active_occurences ( $json->schedules ) ;
     }
   }
 
-  sub _active_occurences ( @schedules ) {
+  sub _active_occurences ( $schedules ) {
     my @occurences = () ;
-    foreach my $schedule ( @schedules ) {
+    foreach my $schedule ( @$schedules ) {
       if ( $schedule->is_valid ) {
         my @occs = LmDP::ScheduleMapper::to_NextOccurence ( $schedule ) ;
         foreach my $occ ( @occs ) {
           if ( $occ->is_active ( $LmDP::now_ts ) ) {
             $LmDP::logger->debug ( "Identified active downtime. LmDP::Schedule is "
-                . Data::Dumper->Dump ( $schedule )
+                . Data::Dumper->Dumper ( $schedule )
                 . " and LmDP::NextOccurence is "
-                . Data::Dumper->Dump ( $occ ) ) ;
+                . Data::Dumper->Dumper ( $occ ) ) ;
             push ( @occurences, $occ ) ;
           }
         }
@@ -451,6 +448,7 @@ local $ENV{TZ} = 'UTC' ;
   package LmDP::Web ;
 
   use Mojolicious::Lite ;
+  use POSIX qw(strftime) ;
   use Data::UUID ;
 
   get '/metrics' => sub ( $c ) {
@@ -459,9 +457,12 @@ local $ENV{TZ} = 'UTC' ;
 
   get '/scheduled-downtime-in-progress.json' => sub ( $c ) {
     $LmDP::Metrics::counter_http_requests->inc ;
-    my @instances = map { { lemmy_instance => $_->lemmy_instance } } LmDP::Scrape::scrape () ;
+    @LmDP::now    = localtime () ;
+    $LmDP::now_ts = strftime ( '%Y-%m-%d %H:%M', @LmDP::now ) . ':00' ;
+    my @instances =
+      map { { lemmy_instance => $_->lemmy_instance } } LmDP::Scrape::scrape ;
     $LmDP::logger->info (
-      "There are " . $#instances + 1 . " instances undergoing scheduled downtime." ) ;
+      "There are " . ( $#instances + 1 ) . " instances undergoing scheduled downtime." ) ;
     my $resp = { scheduled_downtime => \@instances } ;
     $c->render ( json => $resp ) ;
   } ;
