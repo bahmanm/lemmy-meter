@@ -57,13 +57,13 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:3ec741d"
+    image: "bahmanm/lemmy-meter.downtime-processor:2b8bc62"
     entrypoint:
       - "/opt/downtime-processor/downtime-processor.pl"
     command:
       - "prefork"
       - "-m"
-      - "production"
+      - "${LMDP_MODE}"
       - "-l"
       - "http://*:6060"
     ports:
@@ -74,9 +74,9 @@ services:
     environment:
       - LMDP_JSON_SCHEMA=/opt/downtime-processor/scheduled-downtime-schema.json
       - LMDP_SCRAPE_TARGETS=/opt/downtime-processor/scrape-targets.txt
-      - LMDP_LOG_LEVEL=DEBUG
-      - LMDP_GOOGLE_SHEET=https://docs.google.com/spreadsheets/d/1KS3pMzrkW4888LbtqoGR5xylLCfYfkeHrSyMHIIvAfg/export?exportFormat=csv
-      - LMDP_GSHEET_HEADER_ROWS=12
+      - LMDP_LOG_LEVEL=${LMDP_LOG_LEVEL}
+      - LMDP_GSHEET_URL=${LMDP_GSHEET_URL}
+      - LMDP_GSHEET_HEADER_ROWS=${LMDP_GSHEET_HEADER_ROWS}
     user: "${UID}:${GID}"
     restart: always
   nginx:

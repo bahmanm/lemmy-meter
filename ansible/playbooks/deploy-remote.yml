@@ -5,23 +5,40 @@
   tasks:
     - ansible.builtin.assert:
         that:
-          - lemmy_meter_archive_path is defined
+          - lemmy_meter_archive_path
+          - lemmy_meter_command_path
+          - lemmy_meter_cluster_env
 
-    - name: Create a temp directory
-      ansible.builtin.tempfile:
+    - name: Ensure ~/bin exists
+      ansible.builtin.file:
+        path: "${HOME}/bin"
         state: directory
-      register: _tempdir
+
+    - name: Copy lemmy-meter command
+      ansible.builtin.copy:
+        src: "{{ lemmy_meter_command_path }}"
+        dest: "${HOME}/bin/lemmy-meter"
+        remote_src: false
+        mode: "u+x"
+      register: _result
+      changed_when: _result is success
 
     - name: Check if there is a previous installation
       ansible.builtin.stat:
         path: "${HOME}/var"
       register: previous_instalation
 
+    - name: Create a temp directory
+      when: previous_instalation.stat.exists
+      ansible.builtin.tempfile:
+        state: directory
+      register: _tempdir
+
     - name: Stop the cluster
       when: previous_instalation.stat.exists
       ansible.builtin.command:
         cmd: >-
-          bin/lemmy-meter down
+          ${HOME}/bin/lemmy-meter cluster.env={{ lemmy_meter_cluster_env }} down
       register: _result
       changed_when: _result is success
 
@@ -55,6 +72,6 @@
     - name: Start the cluster
       ansible.builtin.command:
         cmd: >-
-          ${HOME}/bin/lemmy-meter up
+          ${HOME}/bin/lemmy-meter cluster.env={{ lemmy_meter_cluster_env }} up
       register: _result
       changed_when: _result is success

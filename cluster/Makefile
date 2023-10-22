@@ -21,7 +21,7 @@ export cluster.deploy-root := $(DEPLOY_ROOT)lemmy-meter/
 
 ####################################################################################################
 
-cluster.services := prometheus grafana blackbox-exporter json-exporter downtime-processor nginx
+cluster.services := prometheus grafana blackbox-exporter json-exporter downtime-processor nginx config
 
 ####################################################################################################
 
@@ -32,12 +32,13 @@ include $(cluster.services:%=$(cluster.srcdir)%/Makefile)
 ####################################################################################################
 
 define cluster.docker-compose
-export UID \
+	export UID \
 	&& export GID=$$(id -g) \
 	&& export CLUSTER_DEPLOY_ROOT=$(cluster.deploy-root) \
 	&& docker compose \
 		--file $(cluster.deploy-root)docker-compose.yml \
-		--project-name $(NAME)
+		--project-name $(NAME) \
+		--env-file $(cluster.deploy-root)config/$(cluster.env).conf
 endef
 
 ####################################################################################################
@@ -73,9 +74,15 @@ cluster.deploy : $(cluster.services:%=cluster.%.deploy)
 
 ####################################################################################################
 
+.PHONY : cluste.ensure-variables
+
+cluster.ensure-variables : bmakelib.error-if-blank( cluster.env )
+
+####################################################################################################
+
 .PHONY : cluster.up
 
-cluster.up : cluster.deploy
+cluster.up : cluster.ensure-variables cluster.deploy
 	$(cluster.docker-compose) \
 		up \
 		--remove-orphans \
@@ -86,7 +93,7 @@ cluster.up : cluster.deploy
 
 .PHONY : cluster.down
 
-cluster.down :
+cluster.down : cluster.ensure-variables
 	$(cluster.docker-compose) \
 		down \
 		--remove-orphans
@@ -95,13 +102,13 @@ cluster.down :
 
 .PHONY : cluster.restart
 
-cluster.restart :
+cluster.restart : cluster.ensure-variables
 	$(cluster.docker-compose) \
 		restart
 
 ####################################################################################################
 
-cluster.restart(%) :
+cluster.restart(%) : cluster.restart
 	$(cluster.docker-compose) \
 		restart \
 		$(*)

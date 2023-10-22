@@ -14,7 +14,7 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
-ansible.root := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+export ansible.root := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 ansible.venv := $(build.dir)ansible-venv/
 ansible.requirements := $(ansible.root)requirements.txt
 ansible.venv.activate := source $(ansible.venv)bin/activate
@@ -40,14 +40,15 @@ $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.app-root,
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.deploy-root,/home/lemmy-meter/var )
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.verbosity,-v )
 $(ansible.playbook.deploy-remote) : bmakelib.error-if-blank( deploy-package )
-$(ansible.playbook.deploy-remote) : \
-		| $(ansible.venv)
+$(ansible.playbook.deploy-remote) : | $(ansible.venv)
 	$(ansible.venv.activate) \
 	&& ansible-playbook \
 		$(ansible.verbosity) \
 		-i '$(ansible.lemmy-meter-server),' \
 		-e 'ansible_user=lemmy-meter' \
 		-e 'lemmy_meter_archive_path=$(deploy-package)' \
+		-e 'lemmy_meter_command_path=$(src.dir)bin/lemmy-meter' \
+		-e 'lemmy_meter_cluster_env=$(cluster.env)' \
 		$(@)
 
 ####################################################################################################
