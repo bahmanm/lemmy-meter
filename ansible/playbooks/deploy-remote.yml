@@ -9,6 +9,11 @@
           - lemmy_meter_command_path
           - lemmy_meter_cluster_env
 
+    - name: Include environment-specific variables
+      when: lemmy_meter_cluster_env == 'prod'
+      ansible.builtin.include_vars:
+        file: "../{{ lemmy_meter_cluster_env }}-vars.vault.yml"
+
     - name: Ensure ~/bin exists
       ansible.builtin.file:
         path: "${HOME}/bin"
@@ -68,6 +73,36 @@
         remote_src: true
       register: _result
       changed_when: _result is success
+
+    - name: Populate matrix-webhook parameters
+      when: lemmy_meter_cluster_env == 'prod'
+      block:
+        - name: MATRIX_WEBHOOK_MATRIX_ID
+          ansible.builtin.lineinfile:
+            path: "${HOME}/var/config/{{ lemmy_meter_cluster_env }}.conf"
+            regexp: "^MATRIX_WEBHOOK_MATRIX_ID="
+            insertafter: EOF
+            line: "MATRIX_WEBHOOK_MATRIX_ID={{ MATRIX_WEBHOOK_MATRIX_ID }}"
+            create: yes
+            state: present
+
+        - name: MATRIX_WEBHOOK_MATRIX_PW
+          ansible.builtin.lineinfile:
+            path: "${HOME}/var/config/{{ lemmy_meter_cluster_env }}.conf"
+            regexp: "^MATRIX_WEBHOOK_MATRIX_PW="
+            insertafter: EOF
+            line: "MATRIX_WEBHOOK_MATRIX_PW={{ MATRIX_WEBHOOK_MATRIX_PW }}"
+            create: yes
+            state: present
+
+        - name: MATRIX_WEBHOOK_API_KEY
+          ansible.builtin.lineinfile:
+            path: "${HOME}/var/config/{{ lemmy_meter_cluster_env }}.conf"
+            regexp: "^MATRIX_WEBHOOK_API_KEY="
+            insertafter: EOF
+            line: "MATRIX_WEBHOOK_API_KEY={{ MATRIX_WEBHOOK_API_KEY }}"
+            create: yes
+            state: present
 
     - name: Start the cluster
       ansible.builtin.command:

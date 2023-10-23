@@ -49,6 +49,9 @@ $(ansible.playbook.deploy-remote) : | $(ansible.venv)
 		-e 'lemmy_meter_archive_path=$(deploy-package)' \
 		-e 'lemmy_meter_command_path=$(src.dir)bin/lemmy-meter' \
 		-e 'lemmy_meter_cluster_env=$(cluster.env)' \
+		$(if $(filter prod,$(cluster.env)) \
+			, --vault-password-file '$(ansible.root).vault-password' \
+			,) \
 		$(@)
 
 ####################################################################################################

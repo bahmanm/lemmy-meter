@@ -4,3 +4,4 @@
 TAGS
 .vagrant
 .vscode
+/ansible/.vault-password
