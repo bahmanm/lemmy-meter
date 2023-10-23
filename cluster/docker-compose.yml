@@ -30,7 +30,7 @@ services:
       - "prometheus-data:/prometheus"
     restart: always
   grafana:
-    image: "grafana/grafana:9.5.13"
+    image: "grafana/grafana:10.1.5"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.ini:/etc/grafana/grafana.ini"
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.db:/var/lib/grafana/grafana.db"
