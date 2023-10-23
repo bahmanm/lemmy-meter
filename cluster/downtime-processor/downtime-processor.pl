@@ -385,7 +385,7 @@ local $ENV{TZ} = 'UTC' ;
   }
 
   sub _json ( $lemmy_instance ) {
-    my $text = _scrape ( "$lemmy_instance/scheduled-downtime.json", $lemmy_instance ) ;
+    my $text = _scrape ( "https://$lemmy_instance/scheduled-downtime.json", $lemmy_instance ) ;
     my $json = LmDP::Json::of_text ( $text, $lemmy_instance ) ;
     if ( !$json ) {
       return () ;
