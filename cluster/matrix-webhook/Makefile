@@ -14,28 +14,22 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
-cluster.grafana.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+cluster.matrix-webhook.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
 ####################################################################################################
 
-.PHONY : cluster.grafana.build
+.PHONY : cluster.matrix-webhook.build
 
-cluster.grafana.build : ;
-
-####################################################################################################
-
-.PHONY : cluster.grafana.push
-
-cluster.grafana.push : ;
+cluster.matrix-webhook.build : ;
 
 ####################################################################################################
 
-$(cluster.deploy-root)grafana: $(cluster.grafana.srcdir)grafana.db $(cluster.grafana.srcdir)grafana.ini
-	mkdir $(@) \
-	&& cp -r $(^) $(@)
+.PHONY : cluster.matrix-webhook.push
+
+cluster.matrix-webhook.push : ;
 
 ####################################################################################################
 
-.PHONY : cluster.grafana.deploy
+.PHONY : cluster.matrix-webhook.deploy
 
-cluster.grafana.deploy : $(cluster.deploy-root)grafana
+cluster.matrix-webhook.deploy : ;

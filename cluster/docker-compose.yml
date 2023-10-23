@@ -79,6 +79,17 @@ services:
       - LMDP_GSHEET_HEADER_ROWS=${LMDP_GSHEET_HEADER_ROWS}
     user: "${UID}:${GID}"
     restart: always
+  matrix-webhook:
+    image: nim65s/matrix-webhook:v3.8.0
+    ports:
+      - "4785:4785"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=4785
+      - MATRIX_ID=${MATRIX_WEBHOOK_MATRIX_ID}
+      - MATRIX_PW=${MATRIX_WEBHOOK_MATRIX_PW}
+      - API_KEY=${MATRIX_WEBHOOK_API_KEY}
+    restart: always
   nginx:
     image: nginx:1.25
     ports:
