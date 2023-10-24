@@ -1,0 +1,13 @@
+requires 'perl', '5.38.0' ;
+
+requires 'Mojolicious',            '9.34' ;
+requires 'Net::Prometheus',        '0.12' ;
+requires 'Data::Dump',             '1.25' ;
+requires 'Schedule::Cron::Events', '1.96' ;
+requires 'Text::CSV',              '2.0.3' ;
+requires 'Moose',                  '2.2206' ;
+requires 'JSON',                   '4.10' ;
+requires 'JSON::Validator',        '5.14' ;
+requires 'File::Slurper',          '0.014' ;
+requires 'Data::UUID',             '1.226' ;
+requires 'Log::Log4perl',          '1.57' ;
