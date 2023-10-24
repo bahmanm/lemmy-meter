@@ -57,10 +57,12 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:1351fb1"
+    image: "bahmanm/lemmy-meter.downtime-processor:d370186"
     entrypoint:
-      - "/opt/downtime-processor/downtime-processor.pl"
+      - "perl"
     command:
+      - "-I/opt/downtime-processor-lib/local/lib/perl5"
+      - "downtime-processor.pl"
       - "prefork"
       - "-m"
       - "${LMDP_MODE}"
