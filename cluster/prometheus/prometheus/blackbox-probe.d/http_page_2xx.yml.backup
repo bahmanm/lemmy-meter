@@ -1,0 +1,50 @@
+####################################################################################################
+# Copyright (c) 2023 Bahman Movaqar
+#
+# This file is part of lemmy-meter.
+# lemmy-meter is free software: you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# lemmy-meter is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with lemmy-meter.
+# If not, see <https://www.gnu.org/licenses/>.
+####################################################################################################
+
+---
+- labels:
+    probe: http_page_2xx
+  targets:
+    - aussie.zone
+    - discuss.tchncs.de
+    - dormi.zone
+    - feddit.nl
+    - lemdro.id
+    - lemmings.world
+    - lemmy.basedcount.com
+    - lemmy.blahaj.zone
+    - lemmy.ca
+    - lemmy.cafe
+    - lemmy.comfysnug.space
+    - lemmy.dbzer0.com
+    - lemmy.myserv.one
+    - lemmy.net.au
+    - lemmy.nz
+    - lemmy.one
+    - lemmy.today
+    - lemmy.world
+    - lemmy.zip
+    - lemmygrad.ml
+    - lemmynsfw.com
+    - midwest.social
+    - pawb.social
+    - programming.dev
+    - sh.itjust.works
+    - slrpnk.net
+    - sopuli.xyz
+    - startrek.website
+    - ttrpg.network
+    - yiffit.net
