@@ -16,8 +16,11 @@
 
 cluster.downtime-processor.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 cluster.downtime-processor.tag := $(cluster.prefix)downtime-processor:$(cluster.tag)
-cluster.downtime-processor.files := downtime-processor.pl scheduled-downtime-schema.json scrape-targets.txt
 cluster.downtime-processor.sources := $(cluster.downtime-processor.srcdir)downtime-processor.pl
+cluster.downtime-processor.files := \
+	downtime-processor.pl \
+	scheduled-downtime-schema.json \
+	scrape-targets.txt
 
 ####################################################################################################
 

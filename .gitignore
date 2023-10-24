@@ -5,3 +5,4 @@ TAGS
 .vagrant
 .vscode
 /ansible/.vault-password
+/cluster/downtime-processor/local/
