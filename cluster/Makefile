@@ -85,7 +85,7 @@ cluster.deploy : $(cluster.services:%=cluster.%.deploy)
 
 ####################################################################################################
 
-.PHONY : cluste.ensure-variables
+.PHONY : cluster.ensure-variables
 
 cluster.ensure-variables : bmakelib.error-if-blank( cluster.env )
 
