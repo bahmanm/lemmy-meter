@@ -17,6 +17,17 @@ server {
 
   ##################################################
 
+  location public/img/fav32.png {
+    alias /srv/www/staging.lemmy-meter.info/img/fav32.png;
+  }
+
+  location ~ ^/.metadata/(.+) {
+    proxy_pass http://nginx_static/$1;
+    proxy_set_header Host $host;
+  }
+
+  ##################################################
+
   location /api/live {
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
@@ -27,17 +38,6 @@ server {
 
   location / {
     proxy_pass http://nginx_grafana;
-    proxy_set_header Host $host;
-  }
-
-  ##################################################
-
-  location public/img/fav32.png {
-    alias /srv/www/staging.lemmy-meter.info/img/fav32.png;
-  }
-
-  location /.metadata {
-    proxy_pass http://nginx_static;
     proxy_set_header Host $host;
   }
 }
