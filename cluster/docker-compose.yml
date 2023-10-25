@@ -57,7 +57,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:19d3653"
+    image: "bahmanm/lemmy-meter.downtime-processor:63b3c24"
     entrypoint:
       - "perl"
     command:
@@ -106,7 +106,7 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
     volumes:
-      - "pg-data:/var/lib/postgresql/data"
+      - "postgres-data:/var/lib/postgresql/data"
     restart: always
 volumes:
   prometheus-data:
