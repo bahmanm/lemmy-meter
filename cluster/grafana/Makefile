@@ -30,7 +30,7 @@ cluster.grafana.push : ;
 
 ####################################################################################################
 
-$(cluster.deploy-root)grafana: $(cluster.grafana.srcdir)grafana.db $(cluster.grafana.srcdir)grafana.ini
+$(cluster.deploy-root)grafana: $(cluster.grafana.srcdir)grafana.ini
 	mkdir -p $(@) \
 	&& cp -r $(^) $(@)
 
