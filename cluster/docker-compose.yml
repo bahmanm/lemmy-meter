@@ -57,7 +57,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:3c00a02"
+    image: "bahmanm/lemmy-meter.downtime-processor:19d3653"
     entrypoint:
       - "perl"
     command:
@@ -99,8 +99,18 @@ services:
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/nginx/:/usr/share/nginx/html:ro"
     restart: always
+  postgres:
+    image: postgres:16.0
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - "pg-data:/var/lib/postgresql/data"
+    restart: always
 volumes:
   prometheus-data:
+  postgres-data:
 networks:
   lemmy-meter:
     attachable: true
