@@ -33,7 +33,6 @@ services:
     image: "grafana/grafana:10.2.0"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.ini:/etc/grafana/grafana.ini"
-      - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.db:/var/lib/grafana/grafana.db"
     ports:
       - "3000:3000"
     user: "${UID}:${GID}"
@@ -57,7 +56,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:63b3c24"
+    image: "bahmanm/lemmy-meter.downtime-processor:8cbfaf7"
     entrypoint:
       - "perl"
     command:
