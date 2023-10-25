@@ -14,7 +14,7 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
-target-instances..blackbox-probes := $(wildcard $(ROOT)config/prometheus/blackbox-probe.d/*.yml)
+target-instances..blackbox-probes := $(wildcard $(ROOT)cluster/prometheus/prometheus/blackbox-probe.d/*.yml)
 
 ####################################################################################################
 
