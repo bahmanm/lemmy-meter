@@ -33,12 +33,6 @@
         path: "${HOME}/var"
       register: previous_instalation
 
-    - name: Create a temp directory
-      when: previous_instalation.stat.exists
-      ansible.builtin.tempfile:
-        state: directory
-      register: _tempdir
-
     - name: Stop the cluster
       when: previous_instalation.stat.exists
       ansible.builtin.command:
@@ -47,30 +41,10 @@
       register: _result
       changed_when: _result is success
 
-    - name: Backup grafana.db
-      when: previous_instalation.stat.exists
-      ansible.builtin.copy:
-        src: "${HOME}/var/grafana/grafana.db"
-        dest: "{{ _tempdir.path }}/grafana.db.backup"
-        remote_src: true
-      register: _result
-      changed_when: _result is success
-
     - name: Extract the archive
       ansible.builtin.unarchive:
         src: "{{ lemmy_meter_archive_path }}"
         dest: "${HOME}"
-      register: _result
-      changed_when: _result is success
-
-    - name: Restore grafana.db
-      when: previous_instalation.stat.exists
-      ansible.builtin.copy:
-        src: "{{ _tempdir.path }}/grafana.db.backup"
-        dest: "${HOME}/var/grafana/grafana.db"
-        force: true
-        backup: true
-        remote_src: true
       register: _result
       changed_when: _result is success
 
