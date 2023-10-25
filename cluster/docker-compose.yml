@@ -57,7 +57,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:d370186"
+    image: "bahmanm/lemmy-meter.downtime-processor:3c00a02"
     entrypoint:
       - "perl"
     command:
