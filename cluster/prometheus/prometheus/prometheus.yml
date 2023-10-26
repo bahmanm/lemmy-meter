@@ -25,7 +25,7 @@ global:
   evaluation_interval: 1m
 
 rule_files:
-  - /etc/prometheus/rules.d/recording.yml
+  - /etc/prometheus/rules.d/*.yml
 
 scrape_configs:
   ##################################################################################################
