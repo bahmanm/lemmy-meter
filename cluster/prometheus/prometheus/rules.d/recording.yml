@@ -1,0 +1,57 @@
+####################################################################################################
+# Copyright (c) 2023 Bahman Movaqar
+#
+# This file is part of lemmy-meter.
+# lemmy-meter is free software: you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# lemmy-meter is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with lemmy-meter.
+# If not, see <https://www.gnu.org/licenses/>.
+####################################################################################################
+
+---
+groups:
+  - name: probe_http_status_code
+    rules:
+      - record: not200:probe_http_status_code:count
+        expr: >-
+          count (
+            probe_http_status_code != 200
+          )
+
+      - record: is200:probe_http_status_code:count
+        expr: >-
+          count (
+            probe_http_status_code == 200
+          )
+
+      - record: lemmy_instance:not200:probe_http_status_code:count
+        expr: >-
+          count (
+            probe_http_status_code != 200
+          ) by (lemmy_instance)
+
+      - record: lemmy_instance:is200:probe_http_status_code:count
+        expr: >-
+          count (
+            probe_http_status_code == 200
+          ) by (lemmy_instance)
+
+  - name: probe_success
+    rules:
+      - record: lemmy_instance:failed:probe_success:count
+        expr: >-
+          count (
+            probe_success == 0
+          ) by (lemmy_instance)
+
+      - record: lemmy_instance:job:probe_success:count
+        expr: >-
+          count (
+            probe_success == 0
+          ) by (lemmy_instance, job)
