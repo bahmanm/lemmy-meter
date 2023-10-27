@@ -1,0 +1,12 @@
+---
+groups:
+  - name: Unavailable
+    rules:
+      - alert: Instance Unavailable
+        expr: lemmy_instance:failed:probe_success:count == 4
+        for: 1m
+        labels:
+          severity: high
+        annotations:
+          summary: "{{ $labels.lemmy_instance }} down."
+          description: "Lemmy instance {{ $labels.lemmy_instance }} has been unavailable for more than 10 minutes."

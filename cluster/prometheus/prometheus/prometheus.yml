@@ -24,6 +24,9 @@ global:
   scrape_timeout: 57s
   evaluation_interval: 1m
 
+rule_files:
+  - /etc/prometheus/rules.d/*.yml
+
 scrape_configs:
   ##################################################################################################
 
