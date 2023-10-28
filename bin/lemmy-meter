@@ -54,7 +54,7 @@ endef
 .PHONY : up
 
 up :
-	$(docker-compose) up --remove-orphans --pull=always --detach
+	$(docker-compose) up --force-recreate --remove-orphans --pull=always --detach
 
 ####################################################################################################
 

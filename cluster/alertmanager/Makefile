@@ -14,17 +14,27 @@
 # If not, see <https://www.gnu.org/licenses/>.
 ####################################################################################################
 
----
-groups:
-  - name: Unavailable
-    rules:
-      - alert: Instance Unavailable
-        expr: lemmy_instance:failed:probe_success:count == 4
-        for: 1m
-        labels:
-          severity: critical
-          lemmy_instance: "{{ $labels.lemmy_instance }}"
-          category: instance_unavailable
-        annotations:
-          summary: "{{ $labels.lemmy_instance }} down"
-          description: "«{{ $labels.lemmy_instance }}» has been unavailable for more than 1 minutes."
+cluster.alertmanager.srcdir := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
+####################################################################################################
+
+.PHONY : cluster.alertmanager.build
+
+cluster.alertmanager.build : ;
+
+####################################################################################################
+
+.PHONY : cluster.alertmanager.push
+
+cluster.alertmanager.push : ;
+
+####################################################################################################
+
+$(cluster.deploy-root)alertmanager: $(cluster.alertmanager.srcdir)alertmanager
+	cp -r $(^) $(@)
+
+####################################################################################################
+
+.PHONY : cluster.alertmanager.deploy
+
+cluster.alertmanager.deploy : $(cluster.deploy-root)alertmanager

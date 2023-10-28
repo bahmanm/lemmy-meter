@@ -24,9 +24,6 @@ global:
   scrape_timeout: 57s
   evaluation_interval: 1m
 
-rule_files:
-  - /etc/prometheus/rules.d/*.yml
-
 scrape_configs:
   ##################################################################################################
 
@@ -139,3 +136,16 @@ scrape_configs:
           - json-exporter:7979
           - grafana:3000
           - prometheus:9090
+
+####################################################################################################
+
+rule_files:
+  - /etc/prometheus/rules.d/*.yml
+
+####################################################################################################
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - "alertmanager:9093"

@@ -15,16 +15,30 @@
 ####################################################################################################
 
 ---
-groups:
-  - name: Unavailable
-    rules:
-      - alert: Instance Unavailable
-        expr: lemmy_instance:failed:probe_success:count == 4
-        for: 1m
-        labels:
-          severity: critical
-          lemmy_instance: "{{ $labels.lemmy_instance }}"
-          category: instance_unavailable
-        annotations:
-          summary: "{{ $labels.lemmy_instance }} down"
-          description: "«{{ $labels.lemmy_instance }}» has been unavailable for more than 1 minutes."
+global:
+  smtp_from: "alerts@lemmy-meter.info"
+  smtp_smarthost: "smtp:25"
+  smtp_require_tls: false
+
+route:
+  receiver: "catchall"
+  group_by:
+    - "severity"
+    - "lemmy_instance"
+
+receivers:
+  - name: catchall
+    email_configs:
+      - to: "instance-unavailable@lemmy-meter.info"
+        headers:
+          subject: '{{ template "email.instance_unavailable.subject.html" . }}'
+        html: '{{ template "email.instance_unavailable.body.html" . }}'
+        send_resolved: true
+    discord_configs:
+      - webhook_url: ${AM_CATCHALL_DISCORD_WEBHOOK}
+        send_resolved: true
+        title: '{{ template "discord.instance_unavailable.title" . }}'
+        message: '{{ template "discord.instance_unavailable.message" . }}'
+
+templates:
+  - /etc/alertmanager/templates.d/*.tmpl
