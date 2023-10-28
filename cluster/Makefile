@@ -97,6 +97,7 @@ cluster.ensure-variables : bmakelib.error-if-blank( cluster.env )
 cluster.up : cluster.ensure-variables cluster.deploy
 	$(cluster.docker-compose) \
 		up \
+		--force-recreate \
 		--remove-orphans \
 		--pull always \
 		--detach

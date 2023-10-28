@@ -36,7 +36,7 @@ $(ansible.venv) :
 ####################################################################################################
 
 $(ansible.playbook.deploy-remote) : bmakelib.error-if-blank( ansible.lemmy-meter-server )
-$(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.app-root,/home/lemmy-meter/app )
+$(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.stop-cluster,False)
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.deploy-root,/home/lemmy-meter/var )
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.verbosity,-v )
 $(ansible.playbook.deploy-remote) : bmakelib.error-if-blank( deploy-package )
@@ -49,6 +49,7 @@ $(ansible.playbook.deploy-remote) : | $(ansible.venv)
 		-e 'lemmy_meter_archive_path=$(deploy-package)' \
 		-e 'lemmy_meter_command_path=$(src.dir)bin/lemmy-meter' \
 		-e 'lemmy_meter_cluster_env=$(cluster.env)' \
+		-e 'lemmy_meter_cluster_stop=$(ansible.stop-cluster)' \
 		$(if $(filter prod,$(cluster.env)) \
 			, --vault-password-file '$(ansible.root).vault-password' \
 			,) \
