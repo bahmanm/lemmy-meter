@@ -18,40 +18,116 @@
 groups:
   - name: probe_http_status_code
     rules:
-      - record: not200:probe_http_status_code:count
-        expr: >-
-          count (
-            probe_http_status_code != 200
-          )
-
-      - record: is200:probe_http_status_code:count
-        expr: >-
-          count (
-            probe_http_status_code == 200
-          )
-
-      - record: lemmy_instance:not200:probe_http_status_code:count
+      - record: lemmy_instance:failed:probe_http_status_code:count
         expr: >-
           count (
             probe_http_status_code != 200
           ) by (lemmy_instance)
 
-      - record: lemmy_instance:is200:probe_http_status_code:count
+      - record: lemmy_instance:ok:probe_http_status_code:count
         expr: >-
           count (
             probe_http_status_code == 200
           ) by (lemmy_instance)
+
+      - record: failed:probe_http_status_code:count
+        expr: >-
+          count (
+            probe_http_status_code != 200
+          )
+
+      - record: ok:probe_http_status_code:count
+        expr: >-
+          count (
+            probe_http_status_code == 200
+          )
 
   - name: probe_success
     rules:
+      - record: lemmy_instance:job:failed:probe_success:count
+        expr: >-
+          count (
+            probe_success == 0
+          ) by (lemmy_instance, job)
+
       - record: lemmy_instance:failed:probe_success:count
         expr: >-
           count (
             probe_success == 0
           ) by (lemmy_instance)
 
+      - record: lemmy_instance:job:ok:probe_success:sum
+        expr: >-
+          sum (
+            probe_success == 1
+          ) by (lemmy_instance, job)
+
+      - record: lemmy_instance:ok:probe_success:sum
+        expr: >-
+          sum (
+            probe_success == 1
+          ) by (lemmy_instance)
+
       - record: lemmy_instance:job:probe_success:count
         expr: >-
           count (
-            probe_success == 0
+            probe_success
           ) by (lemmy_instance, job)
+
+      - record: lemmy_instance:probe_success:count
+        expr: >-
+          count (
+            probe_success
+          ) by (lemmy_instance)
+
+      - record: lemmy_instance:job:probe_success:sum
+        expr: >-
+          sum (probe_success)
+          by (lemmy_instance, job)
+
+      - record: lemmy_instance:probe_success:sum
+        expr: >-
+          sum (probe_success)
+          by (lemmy_instance)
+
+  - name: probe_http_duration_seconds
+    rules:
+      - record: lemmy_instance:job:probe_http_duration_seconds:sum
+        expr: >-
+          sum(
+            probe_http_duration_seconds { phase!="resolve" }
+          ) by (lemmy_instance, job)
+
+      - record: lemmy_instance:probe_http_duration_seconds:sum
+        expr: >-
+          sum(
+            probe_http_duration_seconds { phase!="resolve" }
+          ) by (lemmy_instance)
+
+  - name: latency
+    rules:
+      - record: lemmy_instance:job:latency
+        expr: >-
+          lemmy_instance:job:probe_http_duration_seconds:sum
+          /
+          lemmy_instance:job:ok:probe_success:sum
+
+      - record: lemmy_instance:latency
+        expr: >-
+          lemmy_instance:probe_http_duration_seconds:sum
+          /
+          lemmy_instance:ok:probe_success:sum
+
+  - name: availability
+    rules:
+      - record: lemmy_instance:job:availability
+        expr: >-
+          lemmy_instance:job:ok:probe_success:sum
+          /
+          lemmy_instance:job:probe_success:sum
+
+      - record: lemmy_instance:availability
+        expr: >-
+          lemmy_instance:ok:probe_success:sum
+          /
+          lemmy_instance:probe_success:sum
