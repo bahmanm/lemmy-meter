@@ -78,6 +78,36 @@
             create: yes
             state: present
 
+    - name: Populate smtp parameters
+      when: lemmy_meter_cluster_env == 'prod'
+      block:
+        - name: SMTP_USER
+          ansible.builtin.lineinfile:
+            path: "${HOME}/var/config/{{ lemmy_meter_cluster_env }}.conf"
+            regexp: "^SMTP_USER="
+            insertafter: EOF
+            line: "SMTP_USER={{ SMTP_USER }}"
+            create: yes
+            state: present
+
+        - name: SMTP_PASSWORD
+          ansible.builtin.lineinfile:
+            path: "${HOME}/var/config/{{ lemmy_meter_cluster_env }}.conf"
+            regexp: "^SMTP_PASSWORD="
+            insertafter: EOF
+            line: "SMTP_PASSWORD={{ SMTP_PASSWORD }}"
+            create: yes
+            state: present
+
+    - name: Populate alertmanager config
+      when: lemmy_meter_cluster_env == 'prod'
+      block:
+        - name: AM_CATCHALL_DISCORD_WEBHOOK
+          ansible.builtin.replace:
+            path: "${HOME}/var/alertmanager/alertmanager.yml"
+            regexp: '\${AM_CATCHALL_DISCORD_WEBHOOK}'
+            replace: "{{ AM_CATCHALL_DISCORD_WEBHOOK }}"
+
     - name: Start the cluster
       ansible.builtin.command:
         cmd: >-

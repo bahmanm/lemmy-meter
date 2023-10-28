@@ -1,0 +1,15 @@
+{{ define "discord.instance_unavailable.title" }}❗ lemmy-meter.info - Alert(s){{ end }}
+{{ define "discord.instance_unavailable.message" }}
+  {{ range .Alerts.Firing }}
+    **🔴 {{ .Annotations.summary }}**
+    {{ .Annotations.description }}
+
+  {{ end }}
+
+
+  {{ range .Alerts.Resolved }}
+    🟢 **Resolved**: ~~{{ .Annotations.summary }}~~
+    ~~{{ .Annotations.description }}~~
+
+  {{ end }}
+{{ end }}

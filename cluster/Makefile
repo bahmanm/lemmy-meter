@@ -22,6 +22,7 @@ export cluster.deploy-root := $(DEPLOY_ROOT)lemmy-meter/
 ####################################################################################################
 
 cluster.services := \
+	alertmanager \
 	blackbox-exporter \
 	config \
 	downtime-processor \

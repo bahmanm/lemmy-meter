@@ -1,0 +1,14 @@
+{{ define "email.instance_unavailable.subject.html" }}❗ lemmy-meter.info - Alert(s){{ end }}
+{{ define "email.instance_unavailable.body.html" }}
+  {{ range .Alerts.Firing }}
+    <h1>🔴 {{ .Annotations.summary }}</h1>
+    <p>{{ .Annotations.description }}</p>
+    <br/>
+  {{ end }}
+  <hr />
+  {{ range .Alerts.Resolved }}
+    <h1>🟢 **Resolved**: <s>{{ .Annotations.summary }}</s></h1>
+    <p><s>{{ .Annotations.description }}</s></p>
+    <br/>
+  {{ end }}
+{{ end }}

@@ -58,7 +58,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:6e37068"
+    image: "bahmanm/lemmy-meter.downtime-processor:3409869"
     entrypoint:
       - "perl"
     command:
@@ -111,6 +111,23 @@ services:
     volumes:
       - "postgres-data:/var/lib/postgresql/data"
     restart: always
+  alertmanager:
+    image: prom/alertmanager:v0.26.0
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--log.level=debug"
+    ports:
+      - "9093:9093"
+    volumes:
+      - "${CLUSTER_DEPLOY_ROOT}/alertmanager:/etc/alertmanager"
+    restart: always
+  smtp:
+    image: ixdotai/smtp:v0.5.2
+    ports:
+      - "2525:25"
+    environment:
+      - GMAIL_USER=${SMTP_USER}
+      - GMAIL_PASSWORD=${SMTP_PASSWORD}
 volumes:
   prometheus-data:
   postgres-data:
