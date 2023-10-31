@@ -44,8 +44,10 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: api_getPosts
 
-  - job_name: api_getPosts
+  - job_name: api_getPosts__30s
     scrape_interval: 30s
     metrics_path: /probe
     file_sd_configs:
@@ -62,6 +64,8 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: api_getPosts
 
   ##################################################################################################
 
@@ -83,8 +87,10 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: api_getComments
 
-  - job_name: api_getComments
+  - job_name: api_getComments__30s
     scrape_interval: 30s
     metrics_path: /probe
     file_sd_configs:
@@ -102,6 +108,8 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: api_getComments
 
   ##################################################################################################
 
@@ -123,8 +131,10 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: api_getCommunities
 
-  - job_name: api_getCommunities
+  - job_name: api_getCommunities__30s
     scrape_interval: 30s
     metrics_path: /probe
     file_sd_configs:
@@ -142,6 +152,8 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: api_getCommunities
 
   ##################################################################################################
 
@@ -163,8 +175,10 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: webpage_landing_page
 
-  - job_name: webpage_landing_page
+  - job_name: webpage_landing_page__30s
     scrape_interval: 30s
     metrics_path: /probe
     file_sd_configs:
@@ -182,6 +196,8 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: webpage_landing_page
 
   ##################################################################################################
 
