@@ -18,36 +18,4 @@
 - labels:
     probe: http_api_2xx
   targets:
-    - astraea.pink
-    - aussie.zone
-    - discuss.tchncs.de
-    - dormi.zone
-    - feddit.nl
-    - lemdro.id
-    - lemmings.world
-    - lemmy.blahaj.zone
-    - lemmy.ca
-    - lemmy.cafe
-    - lemmy.comfysnug.space
-    - lemmy.dbzer0.com
-    - lemmy.ml
-    - lemmy.myserv.one
-    - lemmy.net.au
-    - lemmy.nz
-    - lemmy.one
-    - lemmy.today
-    - lemmy.world
-    - lemmy.zip
-    - lemmygrad.ml
-    - lemmynsfw.com
-    - mander.xyz
-    - midwest.social
-    - pawb.social
-    - programming.dev
-    - reddthat.com
-    - sh.itjust.works
-    - slrpnk.net
-    - sopuli.xyz
-    - startrek.website
-    - ttrpg.network
-    - yiffit.net
+    - lemmy.basedcount.com

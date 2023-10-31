@@ -44,6 +44,28 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: api_getPosts
+
+  - job_name: api_getPosts__30s
+    scrape_interval: 30s
+    metrics_path: /probe
+    file_sd_configs:
+      - refresh_interval: 10m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_api_2xx__30s.yml
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: lemmy_instance
+      - source_labels: [__address__]
+        target_label: __param_target
+        replacement: https://$1/api/v3/post/list?limit=1
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [probe]
+        target_label: __param_module
+      - target_label: job
+        replacement: api_getPosts
 
   ##################################################################################################
 
@@ -65,6 +87,29 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: api_getComments
+
+  - job_name: api_getComments__30s
+    scrape_interval: 30s
+    metrics_path: /probe
+    file_sd_configs:
+      - refresh_interval: 10m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_api_2xx__30s.yml
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: lemmy_instance
+        replacement: $1
+      - source_labels: [__address__]
+        target_label: __param_target
+        replacement: https://$1/api/v3/comment/list?limit=1
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [probe]
+        target_label: __param_module
+      - target_label: job
+        replacement: api_getComments
 
   ##################################################################################################
 
@@ -86,6 +131,29 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: api_getCommunities
+
+  - job_name: api_getCommunities__30s
+    scrape_interval: 30s
+    metrics_path: /probe
+    file_sd_configs:
+      - refresh_interval: 10m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_api_2xx__30s.yml
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: lemmy_instance
+        replacement: $1
+      - source_labels: [__address__]
+        target_label: __param_target
+        replacement: https://$1/api/v3/community/list?limit=1
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [probe]
+        target_label: __param_module
+      - target_label: job
+        replacement: api_getCommunities
 
   ##################################################################################################
 
@@ -107,6 +175,29 @@ scrape_configs:
         replacement: blackbox-exporter:9115
       - source_labels: [probe]
         target_label: __param_module
+      - target_label: job
+        replacement: webpage_landing_page
+
+  - job_name: webpage_landing_page__30s
+    scrape_interval: 30s
+    metrics_path: /probe
+    file_sd_configs:
+      - refresh_interval: 10m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_page_2xx__30s.yml
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: lemmy_instance
+        replacement: $1
+      - source_labels: [__address__]
+        target_label: __param_target
+        replacement: https://$1/
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [probe]
+        target_label: __param_module
+      - target_label: job
+        replacement: webpage_landing_page
 
   ##################################################################################################
 
