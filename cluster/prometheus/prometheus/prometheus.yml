@@ -45,6 +45,24 @@ scrape_configs:
       - source_labels: [probe]
         target_label: __param_module
 
+  - job_name: api_getPosts
+    scrape_interval: 30s
+    metrics_path: /probe
+    file_sd_configs:
+      - refresh_interval: 10m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_api_2xx__30s.yml
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: lemmy_instance
+      - source_labels: [__address__]
+        target_label: __param_target
+        replacement: https://$1/api/v3/post/list?limit=1
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [probe]
+        target_label: __param_module
+
   ##################################################################################################
 
   - job_name: api_getComments
@@ -54,6 +72,25 @@ scrape_configs:
       - refresh_interval: 10m
         files:
           - /etc/prometheus/blackbox-probe.d/http_api_2xx.yml
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: lemmy_instance
+        replacement: $1
+      - source_labels: [__address__]
+        target_label: __param_target
+        replacement: https://$1/api/v3/comment/list?limit=1
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [probe]
+        target_label: __param_module
+
+  - job_name: api_getComments
+    scrape_interval: 30s
+    metrics_path: /probe
+    file_sd_configs:
+      - refresh_interval: 10m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_api_2xx__30s.yml
     relabel_configs:
       - source_labels: [__address__]
         target_label: lemmy_instance
@@ -87,6 +124,25 @@ scrape_configs:
       - source_labels: [probe]
         target_label: __param_module
 
+  - job_name: api_getCommunities
+    scrape_interval: 30s
+    metrics_path: /probe
+    file_sd_configs:
+      - refresh_interval: 10m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_api_2xx__30s.yml
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: lemmy_instance
+        replacement: $1
+      - source_labels: [__address__]
+        target_label: __param_target
+        replacement: https://$1/api/v3/community/list?limit=1
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [probe]
+        target_label: __param_module
+
   ##################################################################################################
 
   - job_name: webpage_landing_page
@@ -96,6 +152,25 @@ scrape_configs:
       - refresh_interval: 10m
         files:
           - /etc/prometheus/blackbox-probe.d/http_page_2xx.yml
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: lemmy_instance
+        replacement: $1
+      - source_labels: [__address__]
+        target_label: __param_target
+        replacement: https://$1/
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      - source_labels: [probe]
+        target_label: __param_module
+
+  - job_name: webpage_landing_page
+    scrape_interval: 30s
+    metrics_path: /probe
+    file_sd_configs:
+      - refresh_interval: 10m
+        files:
+          - /etc/prometheus/blackbox-probe.d/http_page_2xx__30s.yml
     relabel_configs:
       - source_labels: [__address__]
         target_label: lemmy_instance
