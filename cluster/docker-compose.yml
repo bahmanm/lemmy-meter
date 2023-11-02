@@ -59,7 +59,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:b7232eb"
+    image: "bahmanm/lemmy-meter.downtime-processor:4e3fb09"
     entrypoint:
       - "perl"
     command:
@@ -129,9 +129,27 @@ services:
     environment:
       - GMAIL_USER=${SMTP_USER}
       - GMAIL_PASSWORD=${SMTP_PASSWORD}
+  ntfy:
+    image: binwiederhier/ntfy:v2.7.0
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
+    command: >-
+      "NTFY_PASSWORD=alertmanager-webhook ntfy user add --ignore-exists alertmanager-webhook && ntfy access alertmanager-webhook '*' write-only && ntfy serve"
+    environment:
+      - TZ=UTCk
+    ports:
+      - "8080:8080"
+    volumes:
+      - "${CLUSTER_DEPLOY_ROOT}/ntfy/server.yml:/etc/ntfy/server.yml"
+      - "ntfy-var:/var/lib/ntfy"
+      - "ntfy-cache:/var/cache/ntfy"
+    restart: always
 volumes:
   prometheus-data:
   postgres-data:
+  ntfy-cache:
+  ntfy-var:
 networks:
   lemmy-meter:
     attachable: true

@@ -1,0 +1,29 @@
+---
+base-url: "http://localhost:8080"
+
+listen-http: ":8080"
+
+cache-file: /var/cache/ntfy/cache.db
+cache-duration: "24h"
+cache-batch-size: 0
+cache-batch-timeout: "0ms"
+
+auth-file: /var/lib/ntfy/user.db
+auth-default-access: "read-only"
+
+attachment-cache-dir: "/var/cache/ntfy/attachments"
+attachment-total-size-limit: "1G"
+attachment-file-size-limit: "1M"
+attachment-expiry-duration: "3h"
+
+enable-signup: false
+enable-login: false
+enable-reservations: false
+
+visitor-subscription-limit: 50
+visitor-request-limit-burst: 30
+visitor-request-limit-replenish: "10s"
+
+enable-metrics: true
+
+log-level: debug
