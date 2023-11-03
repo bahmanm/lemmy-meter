@@ -454,29 +454,19 @@ local $ENV{TZ} = 'UTC' ;
   use Mojo::UserAgent ;
 
   my $templ_alert_md = <<'EOF';
-% if ($severity eq 'error') {
-%   if ($status eq 'firing') {
-      # 🔴\
-%   } else {
-      # 🟢\
-%   }
-% } elsif ($severity eq 'warning') {
-%   if ($status eq 'firing') {
-      ### 🟠\
-%   } else {
-      ### 🟢\
-%   }
-% }
 % if ($status eq 'firing') {
-    <%= $summary %>
+%   if ($severity eq 'error') {
+      🔴 [ERROR] \
+%   } elsif ($severity eq 'warning') {
+      🟠 [WARNING] \
+%   } else {
+      🔵 [OTHER] \
+%   }
 % } else {
-    ~~<%= $summary %>~~
+    🟢 [RESOLVED] \
 % }
-% if ($status eq 'firing') {
-    <%= $description %>
-% } else {
-    ~~<%= $description %>~~
-% }
+<%= $summary %>
+<%= $summary %>
 EOF
 
   sub send_to_ntfy ( $payload ) {
@@ -513,8 +503,8 @@ EOF
 
         my $url = Mojo::URL->new ( "http://ntfy:8080/$topic" )
           ->userinfo ( "${LmDP::ntfy_username}:${LmDP::ntfy_password}" ) ;
-        my $tx = $ua->post ( $url => { 'Content-Type' => 'text/plain', 'Markdown' => 'yes' } =>
-            Encode::encode ( 'UTF-8', $alert_md ) ) ;
+        my $tx = $ua->post (
+          $url => { 'Content-Type' => 'text/plain' } => Encode::encode ( 'UTF-8', $alert_md ) ) ;
 
         if ( $tx->result->is_success ) {
           return LmDP::TRUE ;
