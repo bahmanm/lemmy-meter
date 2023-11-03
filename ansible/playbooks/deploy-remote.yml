@@ -9,6 +9,7 @@
           - lemmy_meter_command_path
           - lemmy_meter_cluster_env
           - lemmy_meter_cluster_stop
+          - lemmy_meter_cluster_restart
 
     - name: Include environment-specific variables
       when: lemmy_meter_cluster_env == 'prod'
@@ -115,6 +116,7 @@
             replace: "{{ AM_CATCHALL_DISCORD_WEBHOOK }}"
 
     - name: Start the cluster
+      when: lemmy_meter_cluster_restart | bool
       ansible.builtin.command:
         cmd: >-
           ${HOME}/bin/lemmy-meter cluster.env={{ lemmy_meter_cluster_env }} up
