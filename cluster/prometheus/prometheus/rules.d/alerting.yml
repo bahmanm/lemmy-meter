@@ -18,13 +18,24 @@
 groups:
   - name: Unavailable
     rules:
-      - alert: Instance Unavailable
+      - alert: WARN - Instance Unavailable
         expr: lemmy_instance:failed:probe_success:count == 4
-        for: 1m
+        for: 5m
         labels:
-          severity: critical
+          severity: warning
           lemmy_instance: "{{ $labels.lemmy_instance }}"
           category: instance_unavailable
         annotations:
           summary: "{{ $labels.lemmy_instance }} down"
-          description: "«{{ $labels.lemmy_instance }}» has been unavailable for more than 1 minutes."
+          description: "«{{ $labels.lemmy_instance }}» has been unavailable for more than 5 minutes."
+
+      - alert: ERROR - Instance Unavailable
+        expr: lemmy_instance:failed:probe_success:count == 4
+        for: 10m
+        labels:
+          severity: error
+          lemmy_instance: "{{ $labels.lemmy_instance }}"
+          category: instance_unavailable
+        annotations:
+          summary: "{{ $labels.lemmy_instance }} down"
+          description: "«{{ $labels.lemmy_instance }}» has been unavailable for more than 10 minutes."
