@@ -31,7 +31,7 @@ scrape_configs:
     scrape_interval: 1m
     metrics_path: /probe
     file_sd_configs:
-      - refresh_interval: 10m
+      - refresh_interval: 3m
         files:
           - /etc/prometheus/blackbox-probe.d/http_api_2xx.yml
     relabel_configs:
@@ -51,7 +51,7 @@ scrape_configs:
     scrape_interval: 30s
     metrics_path: /probe
     file_sd_configs:
-      - refresh_interval: 10m
+      - refresh_interval: 3m
         files:
           - /etc/prometheus/blackbox-probe.d/http_api_2xx__30s.yml
     relabel_configs:
@@ -73,7 +73,7 @@ scrape_configs:
     scrape_interval: 1m
     metrics_path: /probe
     file_sd_configs:
-      - refresh_interval: 10m
+      - refresh_interval: 3m
         files:
           - /etc/prometheus/blackbox-probe.d/http_api_2xx.yml
     relabel_configs:
@@ -94,7 +94,7 @@ scrape_configs:
     scrape_interval: 30s
     metrics_path: /probe
     file_sd_configs:
-      - refresh_interval: 10m
+      - refresh_interval: 3m
         files:
           - /etc/prometheus/blackbox-probe.d/http_api_2xx__30s.yml
     relabel_configs:
@@ -117,7 +117,7 @@ scrape_configs:
     scrape_interval: 1m
     metrics_path: /probe
     file_sd_configs:
-      - refresh_interval: 10m
+      - refresh_interval: 3m
         files:
           - /etc/prometheus/blackbox-probe.d/http_api_2xx.yml
     relabel_configs:
@@ -138,7 +138,7 @@ scrape_configs:
     scrape_interval: 30s
     metrics_path: /probe
     file_sd_configs:
-      - refresh_interval: 10m
+      - refresh_interval: 3m
         files:
           - /etc/prometheus/blackbox-probe.d/http_api_2xx__30s.yml
     relabel_configs:
@@ -161,7 +161,7 @@ scrape_configs:
     scrape_interval: 1m
     metrics_path: /probe
     file_sd_configs:
-      - refresh_interval: 10m
+      - refresh_interval: 3m
         files:
           - /etc/prometheus/blackbox-probe.d/http_page_2xx.yml
     relabel_configs:
@@ -182,7 +182,7 @@ scrape_configs:
     scrape_interval: 30s
     metrics_path: /probe
     file_sd_configs:
-      - refresh_interval: 10m
+      - refresh_interval: 3m
         files:
           - /etc/prometheus/blackbox-probe.d/http_page_2xx__30s.yml
     relabel_configs:

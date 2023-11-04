@@ -20,8 +20,10 @@
   targets:
     - astraea.pink
     - aussie.zone
+    - discuss.online
     - discuss.tchncs.de
     - dormi.zone
+    - feddit.dk
     - feddit.nl
     - lemdro.id
     - lemmings.world
@@ -30,6 +32,7 @@
     - lemmy.cafe
     - lemmy.comfysnug.space
     - lemmy.dbzer0.com
+    - lemmy.eco.br
     - lemmy.ml
     - lemmy.myserv.one
     - lemmy.net.au
@@ -38,6 +41,7 @@
     - lemmy.today
     - lemmy.world
     - lemmy.zip
+    - lemmyf.uk
     - lemmygrad.ml
     - lemmynsfw.com
     - mander.xyz
