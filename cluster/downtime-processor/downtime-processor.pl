@@ -458,7 +458,7 @@ local $ENV{TZ} = 'UTC' ;
 %   if ($severity eq 'error') {
       🔴 [ERROR] \
 %   } elsif ($severity eq 'warning') {
-      🟠 [WARNING] \
+      🟠 [WARN] \
 %   } else {
       🔵 [OTHER] \
 %   }
@@ -466,7 +466,7 @@ local $ENV{TZ} = 'UTC' ;
     🟢 [RESOLVED] \
 % }
 <%= $summary %>
-<%= $summary %>
+<%= $description %>
 EOF
 
   sub send_to_ntfy ( $payload ) {
