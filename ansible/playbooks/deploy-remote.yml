@@ -125,7 +125,6 @@
             state: present
 
     - name: Populate Alertmanager config
-      when: lemmy_meter_cluster_env == 'prod'
       block:
         - name: "[alertmanager config] AM_CATCHALL_DISCORD_WEBHOOK"
           ansible.builtin.replace:
