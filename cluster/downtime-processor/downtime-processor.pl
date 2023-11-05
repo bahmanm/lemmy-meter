@@ -501,6 +501,14 @@ EOF
           }
         ) ;
 
+        {
+          my $url = Mojo::URL->new ( "http://ntfy:8080/__all__" )
+            ->userinfo ( "${LmDP::ntfy_username}:${LmDP::ntfy_password}" ) ;
+          my $tx = $ua->post (
+            $url => { 'Content-Type' => 'text/plain' } => Encode::encode ( 'UTF-8', $alert_md )
+          ) ;
+        } ;
+
         my $url = Mojo::URL->new ( "http://ntfy:8080/$topic" )
           ->userinfo ( "${LmDP::ntfy_username}:${LmDP::ntfy_password}" ) ;
         my $tx = $ua->post (
