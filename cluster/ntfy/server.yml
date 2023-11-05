@@ -1,5 +1,5 @@
 ---
-base-url: "http://staging.lemmy-meter.info/alerts/"
+base-url: "http://staging.lemmy-meter.info/alerts"
 listen-http: ":8080"
 behind-proxy: true
 enable-metrics: true

@@ -59,7 +59,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:8bc55b1"
+    image: "bahmanm/lemmy-meter.downtime-processor:7d49c8d"
     entrypoint:
       - "perl"
     command:
@@ -81,6 +81,8 @@ services:
       - LMDP_LOG_LEVEL=${LMDP_LOG_LEVEL}
       - LMDP_GSHEET_URL=${LMDP_GSHEET_URL}
       - LMDP_GSHEET_HEADER_ROWS=${LMDP_GSHEET_HEADER_ROWS}
+      - LMDP_NTFY_USERNAME=${LMDP_NTFY_USERNAME}
+      - LMDP_NTFY_PASSWORD=${LMDP_NTFY_PASSWORD}
     user: "${UID}:${GID}"
     restart: always
   matrix-webhook:
@@ -137,7 +139,7 @@ services:
     command: >-
       "NTFY_PASSWORD=${LMDP_NTFY_PASSWORD} ntfy user add --ignore-exists ${LMDP_NTFY_USERNAME} && ntfy access ${LMDP_NTFY_USERNAME} '*' write-only && ntfy serve"
     environment:
-      - TZ=UTCk
+      - TZ=UTC
     ports:
       - "8080:8080"
     volumes:
