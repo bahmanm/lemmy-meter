@@ -46,15 +46,13 @@ $(ansible.playbook.deploy-remote) : | $(ansible.venv)
 	&& ansible-playbook \
 		$(ansible.verbosity) \
 		-i '$(ansible.lemmy-meter-server),' \
+		--vault-password-file '$(ansible.root).vault-password-$(cluster.env)' \
 		-e 'ansible_user=lemmy-meter' \
 		-e 'lemmy_meter_archive_path=$(deploy-package)' \
 		-e 'lemmy_meter_command_path=$(src.dir)bin/lemmy-meter' \
 		-e 'lemmy_meter_cluster_env=$(cluster.env)' \
 		-e 'lemmy_meter_cluster_stop=$(ansible.stop-cluster)' \
 		-e 'lemmy_meter_cluster_restart=$(ansible.restart-cluster)' \
-		$(if $(filter prod,$(cluster.env)) \
-			, --vault-password-file '$(ansible.root).vault-password' \
-			,) \
 		$(@)
 
 ####################################################################################################

@@ -1,0 +1,28 @@
+---
+base-url: "https://alerts.lemmy-meter.info"
+web-root: "/"
+listen-http: ":8080"
+behind-proxy: true
+enable-metrics: true
+log-level: debug
+
+auth-file: /var/lib/ntfy/user.db
+auth-default-access: "read-only"
+
+enable-signup: false
+enable-login: false
+enable-reservations: false
+
+cache-file: /var/cache/ntfy/cache.db
+cache-duration: "24h"
+cache-batch-size: 0
+cache-batch-timeout: "0ms"
+
+attachment-cache-dir: "/var/cache/ntfy/attachments"
+attachment-total-size-limit: "1G"
+attachment-file-size-limit: "1M"
+attachment-expiry-duration: "3h"
+
+visitor-subscription-limit: 50
+visitor-request-limit-burst: 30
+visitor-request-limit-replenish: "10s"

@@ -59,7 +59,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:4e3fb09"
+    image: "bahmanm/lemmy-meter.downtime-processor:3991262"
     entrypoint:
       - "perl"
     command:
@@ -81,6 +81,8 @@ services:
       - LMDP_LOG_LEVEL=${LMDP_LOG_LEVEL}
       - LMDP_GSHEET_URL=${LMDP_GSHEET_URL}
       - LMDP_GSHEET_HEADER_ROWS=${LMDP_GSHEET_HEADER_ROWS}
+      - LMDP_NTFY_USERNAME=${LMDP_NTFY_USERNAME}
+      - LMDP_NTFY_PASSWORD=${LMDP_NTFY_PASSWORD}
     user: "${UID}:${GID}"
     restart: always
   matrix-webhook:
@@ -129,9 +131,27 @@ services:
     environment:
       - GMAIL_USER=${SMTP_USER}
       - GMAIL_PASSWORD=${SMTP_PASSWORD}
+  ntfy:
+    image: binwiederhier/ntfy:v2.7.0
+    entrypoint:
+      - "/bin/sh"
+      - "-c"
+    command: >-
+      "NTFY_PASSWORD=${LMDP_NTFY_PASSWORD} ntfy user add --ignore-exists ${LMDP_NTFY_USERNAME} && ntfy access ${LMDP_NTFY_USERNAME} '*' write-only && ntfy serve"
+    environment:
+      - TZ=UTC
+    ports:
+      - "8080:8080"
+    volumes:
+      - "${CLUSTER_DEPLOY_ROOT}/ntfy/server.yml:/etc/ntfy/server.yml"
+      - "ntfy-var:/var/lib/ntfy"
+      - "ntfy-cache:/var/cache/ntfy"
+    restart: always
 volumes:
   prometheus-data:
   postgres-data:
+  ntfy-cache:
+  ntfy-var:
 networks:
   lemmy-meter:
     attachable: true

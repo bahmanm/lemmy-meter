@@ -21,7 +21,7 @@ export cluster.deploy-root := $(DEPLOY_ROOT)lemmy-meter/
 
 ####################################################################################################
 
-cluster.services := \
+cluster.components := \
 	alertmanager \
 	blackbox-exporter \
 	config \
@@ -30,13 +30,14 @@ cluster.services := \
 	json-exporter \
 	matrix-webhook \
 	nginx \
+	ntfy \
 	prometheus
 
 ####################################################################################################
 
-.PHONY : $(cluster.services:%=$(cluster.srcdir)%/Makefile)
+.PHONY : $(cluster.components:%=$(cluster.srcdir)%/Makefile)
 
-include $(cluster.services:%=$(cluster.srcdir)%/Makefile)
+include $(cluster.components:%=$(cluster.srcdir)%/Makefile)
 
 ####################################################################################################
 
@@ -64,13 +65,13 @@ $(cluster.deploy-root)docker-compose.yml : $(cluster.srcdir)docker-compose.yml
 
 .PHONY : cluster.build
 
-cluster.build : $(cluster.services:%=cluster.%.build)
+cluster.build : $(cluster.components:%=cluster.%.build)
 
 ####################################################################################################
 
 .PHONY : cluster.push
 
-cluster.push : $(cluster.services:%=cluster.%.push)
+cluster.push : $(cluster.components:%=cluster.%.push)
 
 ####################################################################################################
 
@@ -82,7 +83,7 @@ cluster.deploy : \
 		cluster.push
 cluster.deploy : | $(cluster.deploy-root)
 cluster.deploy : $(cluster.deploy-root)docker-compose.yml
-cluster.deploy : $(cluster.services:%=cluster.%.deploy)
+cluster.deploy : $(cluster.components:%=cluster.%.deploy)
 
 ####################################################################################################
 

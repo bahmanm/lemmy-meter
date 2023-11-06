@@ -28,7 +28,9 @@ local $ENV{TZ} = 'UTC' ;
     TIMESTAMP_FORMAT                => '%Y-%m-%d %H:%M:%S',
     DEFAULT_SCRAPE_TARGETS_LOCATION => './scrape-targets.txt',
     DEFAULT_SCHEMA_LOCATION         => './scheduled-downtime-schema.json',
-    DEFAULT_LOG_LEVEL               => 'WARN'
+    DEFAULT_LOG_LEVEL               => 'DEBUG',
+    DEFAULT_NTFY_USERNAME           => 'alertmanager-webhook',
+    DEFAULT_NTFY_PASSWORD           => 'alertmanager-webhook'
   } ;
 
   my $log4perl_conf = q(
@@ -43,6 +45,9 @@ local $ENV{TZ} = 'UTC' ;
   our $log_level           = ( $ENV{LMDP_LOG_LEVEL}      or DEFAULT_LOG_LEVEL ) ;
   our $gsheet_url          = ( $ENV{LMDP_GSHEET_URL}     or DEFAULT_GSHEET_URL ) ;
   our $ghseet_header_rows  = ( $ENV{LMDP_GSHEET_HEADER_ROWS} or DEFAULT_GSHEET_HEADER_ROWS ) ;
+
+  our $ntfy_username = ( $ENV{LMDP_NTFY_USERNAME} or DEFAULT_NTFY_USERNAME ) ;
+  our $ntfy_password = ( $ENV{LMDP_NTFY_PASSWORD} or DEFAULT_NTFY_PASSWORD ) ;
 
   our $json_validator = JSON::Validator->new->schema ( $json_schema_path ) ;
   our ( @now, $now_ts ) = ( undef, undef ) ;
@@ -441,6 +446,95 @@ local $ENV{TZ} = 'UTC' ;
 ####################################################################################################
 
 {
+  ####################
+  # alertmanager-ntfy-bridge
+  ####################
+  package LmDP::AlertManagerNtfyBridge ;
+
+  use Mojo::UserAgent ;
+
+  my $templ_alert_md = <<'EOF';
+% if ($status eq 'firing') {
+%   if ($severity eq 'error') {
+      🔴 [ERROR] \
+%   } elsif ($severity eq 'warning') {
+      🟠 [WARN] \
+%   } else {
+      🔵 [OTHER] \
+%   }
+<%= $summary %>
+<%= $description %>
+% } else {
+    🟢 [RESOLVED] <%= $summary %>
+% }
+EOF
+
+  sub send_to_ntfy ( $payload ) {
+    if ( !$payload ) {
+      return LmDP::FALSE ;
+    }
+    try {
+      my $ua = Mojo::UserAgent->new ;
+      foreach my $alert ( @{ $payload->{alerts} } ) {
+        my $status      = $alert->{status} ;
+        my $topic       = $alert->{labels}->{lemmy_instance} ;
+        my $name        = $alert->{labels}->{alertname} ;
+        my $severity    = $alert->{labels}->{severity} ;
+        my $summary     = $alert->{annotations}->{summary} ;
+        my $description = $alert->{annotations}->{description} ;
+        $LmDP::logger->debug ( "Received Alert: status='$status' "
+            . "name='$name' "
+            . "severity='$severity' "
+            . "instance='$topic' "
+            . "summary='$summary' "
+            . "description='$description'" ) ;
+        $topic =~ s/\./_/g ;
+
+        my $template = Mojo::Template->new ( vars => 1 ) ;
+        my $alert_md = $template->render (
+          $templ_alert_md,
+          {
+            status      => $status,
+            summary     => $summary,
+            description => $description,
+            severity    => $severity
+          }
+        ) ;
+
+        {
+          my $url = Mojo::URL->new ( "http://ntfy:8080/__all__" )
+            ->userinfo ( "${LmDP::ntfy_username}:${LmDP::ntfy_password}" ) ;
+          my $tx = $ua->post (
+            $url => { 'Content-Type' => 'text/plain' } => Encode::encode ( 'UTF-8', $alert_md )
+          ) ;
+        } ;
+
+        my $url = Mojo::URL->new ( "http://ntfy:8080/$topic" )
+          ->userinfo ( "${LmDP::ntfy_username}:${LmDP::ntfy_password}" ) ;
+        my $tx = $ua->post (
+          $url => { 'Content-Type' => 'text/plain' } => Encode::encode ( 'UTF-8', $alert_md ) ) ;
+
+        if ( $tx->result->is_success ) {
+          return LmDP::TRUE ;
+        }
+        else {
+          $LmDP::logger->debug ( "Posting to ntfy failed: ${tx->result->message}" ) ;
+          return LmDP::FALSE ;
+        }
+      }
+      return LmDP::TRUE ;
+    }
+    catch ( $err ) {
+      $LmDP::logger->error ( "Failed to send payload to ntfy: $err" ) ;
+      return LmDP::FALSE ;
+    }
+  }
+
+}
+
+####################################################################################################
+
+{
 
   ####################
   # The web server.
@@ -450,6 +544,7 @@ local $ENV{TZ} = 'UTC' ;
   use Mojolicious::Lite ;
   use POSIX qw(strftime) ;
   use Data::UUID ;
+  use Data::Dump qw(dump) ;
 
   get '/metrics' => sub ( $c ) {
     $c->render ( text => $LmDP::Metrics::prom->render ) ;
@@ -465,6 +560,16 @@ local $ENV{TZ} = 'UTC' ;
       "There are " . ( $#instances + 1 ) . " instances undergoing scheduled downtime." ) ;
     my $resp = { scheduled_downtime => \@instances } ;
     $c->render ( json => $resp ) ;
+  } ;
+
+  post '/alertmanager-webhook' => sub ( $c ) {
+    my $result = LmDP::AlertManagerNtfyBridge::send_to_ntfy ( $c->req->json ) ;
+    if ( $result == LmDP::TRUE ) {
+      $c->render ( text => 'ok', status => 200 ) ;
+    }
+    else {
+      $c->render ( text => 'failed', status => 500 ) ;
+    }
   } ;
 
   our $ug   = Data::UUID->new ;
