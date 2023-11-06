@@ -45,12 +45,12 @@ receivers:
 
 inhibit_rules:
   - equal:
-      - "lemmy_instance"
-      - "category"
-  - source_matchers:
-      - severity = error
-  - target_matchers:
-      - severity = warning
+      - lemmy_instance
+      - category
+    source_matchers:
+      - severity = "error"
+    target_matchers:
+      - severity = "warning"
 
 templates:
   - /etc/alertmanager/templates.d/*.tmpl
