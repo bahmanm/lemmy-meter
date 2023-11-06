@@ -56,35 +56,6 @@
 
     ################################################################################
 
-    - name: Populate matrix-webhook parameters
-      block:
-        - name: "[matrix-webhook config] MATRIX_WEBHOOK_MATRIX_ID"
-          ansible.builtin.lineinfile:
-            path: "${HOME}/var/config/{{ lemmy_meter_cluster_env }}.conf"
-            regexp: "^MATRIX_WEBHOOK_MATRIX_ID="
-            insertafter: EOF
-            line: "MATRIX_WEBHOOK_MATRIX_ID={{ MATRIX_WEBHOOK_MATRIX_ID }}"
-            create: true
-            state: present
-
-        - name: "[matrix-webhook config] MATRIX_WEBHOOK_MATRIX_PW"
-          ansible.builtin.lineinfile:
-            path: "${HOME}/var/config/{{ lemmy_meter_cluster_env }}.conf"
-            regexp: "^MATRIX_WEBHOOK_MATRIX_PW="
-            insertafter: EOF
-            line: "MATRIX_WEBHOOK_MATRIX_PW={{ MATRIX_WEBHOOK_MATRIX_PW }}"
-            create: true
-            state: present
-
-        - name: "[matrix-webhook config] MATRIX_WEBHOOK_API_KEY"
-          ansible.builtin.lineinfile:
-            path: "${HOME}/var/config/{{ lemmy_meter_cluster_env }}.conf"
-            regexp: "^MATRIX_WEBHOOK_API_KEY="
-            insertafter: EOF
-            line: "MATRIX_WEBHOOK_API_KEY={{ MATRIX_WEBHOOK_API_KEY }}"
-            create: true
-            state: present
-
     - name: Populate smtp parameters
       block:
         - name: "[smtp config] SMTP_USER"

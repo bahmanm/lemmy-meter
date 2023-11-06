@@ -59,7 +59,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:3991262"
+    image: "bahmanm/lemmy-meter.downtime-processor:cd650a5"
     entrypoint:
       - "perl"
     command:
@@ -84,17 +84,6 @@ services:
       - LMDP_NTFY_USERNAME=${LMDP_NTFY_USERNAME}
       - LMDP_NTFY_PASSWORD=${LMDP_NTFY_PASSWORD}
     user: "${UID}:${GID}"
-    restart: always
-  matrix-webhook:
-    image: nim65s/matrix-webhook:v3.8.0
-    ports:
-      - "4785:4785"
-    environment:
-      - HOST=0.0.0.0
-      - PORT=4785
-      - MATRIX_ID=${MATRIX_WEBHOOK_MATRIX_ID}
-      - MATRIX_PW=${MATRIX_WEBHOOK_MATRIX_PW}
-      - API_KEY=${MATRIX_WEBHOOK_API_KEY}
     restart: always
   nginx:
     image: nginx:1.25
