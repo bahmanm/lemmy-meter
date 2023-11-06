@@ -1,0 +1,109 @@
+####################################################################################################
+# Copyright (c) 2023 Bahman Movaqar
+#
+# This file is part of lemmy-meter.
+# lemmy-meter is free software: you can redistribute it and/or modify it under the terms of the GNU
+# General Public License as published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+#
+# lemmy-meter is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with lemmy-meter.
+# If not, see <https://www.gnu.org/licenses/>.
+####################################################################################################
+
+---
+groups:
+  ##################################################################################################
+
+  - name: availability
+    rules:
+      - record: lemmy_instance:availability:1h:percent
+        expr: >-
+          (
+            sum_over_time (
+              lemmy_instance:ok:probe_success:sum[1h]
+            )
+            /
+            sum_over_time (
+              lemmy_instance:probe_success:count[1h]
+            )
+          ) * 100
+
+      - record: lemmy_instance:availability:3h:percent
+        expr: >-
+          (
+            sum_over_time (
+              lemmy_instance:ok:probe_success:sum[3h]
+            )
+            /
+            sum_over_time (
+              lemmy_instance:probe_success:count[3h]
+            )
+          ) * 100
+
+      - record: lemmy_instance:availability:1d:percent
+        expr: >-
+          (
+            sum_over_time (
+              lemmy_instance:ok:probe_success:sum[1d]
+            )
+            /
+            sum_over_time (
+              lemmy_instance:probe_success:count[1d]
+            )
+          ) * 100
+
+      - record: lemmy_instance:availability:7d:percent
+        expr: >-
+          (
+            sum_over_time (
+              lemmy_instance:ok:probe_success:sum[7d]
+            )
+            /
+            sum_over_time (
+              lemmy_instance:probe_success:count[7d]
+            )
+          ) * 100
+
+      - record: lemmy_instance:availability:30d:percent
+        expr: >-
+          (
+            sum_over_time (
+              lemmy_instance:ok:probe_success:sum[30d]
+            )
+            /
+            sum_over_time (
+              lemmy_instance:probe_success:count[30d]
+            )
+          ) * 100
+
+      - record: lemmy_instance:availability:90d:percent
+        expr: >-
+          (
+            sum_over_time (
+              lemmy_instance:ok:probe_success:sum[90d]
+            )
+            /
+            sum_over_time (
+              lemmy_instance:probe_success:count[90d]
+            )
+          ) * 100
+
+  ##################################################################################################
+
+  - name: relative_availability
+    rules:
+      - record: lemmy_instance:relative_availability:1h:7d:percent
+        expr: >-
+          lemmy_instance:availability:1h:percent
+          -
+          lemmy_instance:availability:7d:percent
+
+      - record: lemmy_instance:relative_availability:3h:7d:percent
+        expr: >-
+          lemmy_instance:availability:3h:percent
+          -
+          lemmy_instance:availability:7d:percent

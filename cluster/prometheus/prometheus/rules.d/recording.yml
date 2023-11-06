@@ -103,31 +103,3 @@ groups:
           sum(
             probe_http_duration_seconds { phase!="resolve" }
           ) by (lemmy_instance)
-
-  - name: latency
-    rules:
-      - record: lemmy_instance:job:latency
-        expr: >-
-          lemmy_instance:job:probe_http_duration_seconds:sum
-          /
-          lemmy_instance:job:ok:probe_success:sum
-
-      - record: lemmy_instance:latency
-        expr: >-
-          lemmy_instance:probe_http_duration_seconds:sum
-          /
-          lemmy_instance:ok:probe_success:sum
-
-  - name: availability
-    rules:
-      - record: lemmy_instance:job:availability
-        expr: >-
-          lemmy_instance:job:ok:probe_success:sum
-          /
-          lemmy_instance:job:probe_success:sum
-
-      - record: lemmy_instance:availability
-        expr: >-
-          lemmy_instance:ok:probe_success:sum
-          /
-          lemmy_instance:probe_success:sum
