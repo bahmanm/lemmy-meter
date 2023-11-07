@@ -9,7 +9,7 @@
           - lemmy_meter_command_path
           - lemmy_meter_cluster_env
           - lemmy_meter_cluster_stop
-          - lemmy_meter_cluster_restart
+          - lemmy_meter_cluster_recreate is defined
 
     - name: Include environment-specific variables
       ansible.builtin.include_vars:
@@ -106,10 +106,13 @@
 
     ################################################################################
 
-    - name: Start the cluster
-      when: lemmy_meter_cluster_restart | bool
+    - name: Recreate/Start the cluster
+      when: lemmy_meter_cluster_recreate != 'False'
       ansible.builtin.command:
         cmd: >-
-          ${HOME}/bin/lemmy-meter cluster.env={{ lemmy_meter_cluster_env }} up
+          ${HOME}/bin/lemmy-meter
+          cluster.env={{ lemmy_meter_cluster_env }}
+          cluster.services="{{ lemmy_meter_cluster_recreate | regex_replace('True', '') }}"
+          up
       register: _result
       changed_when: _result is success
