@@ -462,11 +462,10 @@ local $ENV{TZ} = 'UTC' ;
 %   } else {
       🔵 [OTHER] \
 %   }
-<%= $summary %>
-<%= $description %>
 % } else {
-    🟢 [RESOLVED] <%= $summary %>
+    🟢 [RESOLVED] \
 % }
+ <%= $summary %>
 EOF
 
   sub send_to_ntfy ( $payload ) {
