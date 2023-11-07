@@ -39,7 +39,7 @@ $(ansible.playbook.deploy-remote) : bmakelib.error-if-blank( ansible.lemmy-meter
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.stop-cluster,False)
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.deploy-root,/home/lemmy-meter/var )
 $(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.verbosity,-v )
-$(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.restart-cluster,False)
+$(ansible.playbook.deploy-remote) : bmakelib.default-if-blank( ansible.recreate-cluster,False)
 $(ansible.playbook.deploy-remote) : bmakelib.error-if-blank( deploy-package )
 $(ansible.playbook.deploy-remote) : | $(ansible.venv)
 	$(ansible.venv.activate) \
@@ -52,7 +52,7 @@ $(ansible.playbook.deploy-remote) : | $(ansible.venv)
 		-e 'lemmy_meter_command_path=$(src.dir)bin/lemmy-meter' \
 		-e 'lemmy_meter_cluster_env=$(cluster.env)' \
 		-e 'lemmy_meter_cluster_stop=$(ansible.stop-cluster)' \
-		-e 'lemmy_meter_cluster_restart=$(ansible.restart-cluster)' \
+		-e 'lemmy_meter_cluster_recreate="$(ansible.recreate-cluster)"' \
 		$(@)
 
 ####################################################################################################
