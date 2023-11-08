@@ -45,31 +45,31 @@ groups:
       - record: lemmy_instance:avg_instant_latency:3h
         expr: >-
           avg_over_time(
-            lemmy_instance:latency[3h]
+            lemmy_instance:instant_latency[3h]
           )
 
       - record: lemmy_instance:avg_instant_latency:1d
         expr: >-
           avg_over_time(
-            lemmy_instance:latency[1d]
+            lemmy_instance:instant_latency[1d]
           )
 
       - record: lemmy_instance:avg_instant_latency:7d
         expr: >-
           avg_over_time(
-            lemmy_instance:latency[7d]
+            lemmy_instance:instant_latency[7d]
           )
 
       - record: lemmy_instance:avg_instant_latency:30d
         expr: >-
           avg_over_time(
-            lemmy_instance:latency[30d]
+            lemmy_instance:instant_latency[30d]
           )
 
       - record: lemmy_instance:avg_instant_latency:90d
         expr: >-
           avg_over_time(
-            lemmy_instance:latency[90d]
+            lemmy_instance:instant_latency[90d]
           )
 
   ##################################################################################################
