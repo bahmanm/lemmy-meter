@@ -21,7 +21,7 @@ services:
     image: "prom/prometheus:v2.47.2"
     command:
       - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=60d"
+      - "--storage.tsdb.retention.time=120d"
       - "--config.file=/etc/prometheus/prometheus.yml"
       - "--log.level=debug"
     ports:
@@ -59,7 +59,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   downtime-processor:
-    image: "bahmanm/lemmy-meter.downtime-processor:93c970d"
+    image: "bahmanm/lemmy-meter.downtime-processor:3c40c04"
     entrypoint:
       - "perl"
     command:
