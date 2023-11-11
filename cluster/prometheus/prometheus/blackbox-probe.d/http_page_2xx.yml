@@ -18,11 +18,11 @@
 - labels:
     probe: http_page_2xx
   targets:
-    - astraea.pink
     - aussie.zone
     - discuss.online
     - discuss.tchncs.de
     - dormi.zone
+    - dubvee.org
     - feddit.dk
     - feddit.nl
     - lemdro.id
@@ -35,7 +35,6 @@
     - lemmy.eco.br
     - lemmy.ml
     - lemmy.myserv.one
-    - lemmy.net.au
     - lemmy.nz
     - lemmy.one
     - lemmy.today
