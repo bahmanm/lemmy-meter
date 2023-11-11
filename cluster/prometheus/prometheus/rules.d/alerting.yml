@@ -67,23 +67,23 @@ groups:
   - name: High Latency
     rules:
       - alert: WARN - Latency
-        expr: lemmy_instance:relative_latency:1h:7d:percent > 30
-        for: 15m
+        expr: lemmy_instance:relative_latency:1h:7d:percent > 80
+        for: 60m
         labels:
           severity: warning
           lemmy_instance: "{{ $labels.lemmy_instance }}"
           category: instance_latency
         annotations:
-          summary: "[Latency spike > 30%] [15+ mins] {{ $labels.lemmy_instance }}"
-          description: "«{{ $labels.lemmy_instance }}» latency has been increasing by at least 30% for more than 15 minutes."
+          summary: "[Latency spike > 80%] [1+ hr] {{ $labels.lemmy_instance }}"
+          description: "«{{ $labels.lemmy_instance }}» latency has increased by at least 80% over the past 1 hour."
 
       - alert: ERROR - Latency
-        expr: lemmy_instance:relative_latency:1h:7d:percent > 30
-        for: 15m
+        expr: lemmy_instance:relative_latency:1h:7d:percent > 80
+        for: 120m
         labels:
           severity: error
           lemmy_instance: "{{ $labels.lemmy_instance }}"
           category: instance_latency
         annotations:
-          summary: "[Latency spike > 30%] [30+ mins] {{ $labels.lemmy_instance }}"
-          description: "«{{ $labels.lemmy_instance }}» latency has been increasing by at least 30% for more than 30 minutes."
+          summary: "[Latency spike > 80%] [2+ hrs] {{ $labels.lemmy_instance }}"
+          description: "«{{ $labels.lemmy_instance }}» latency has increased by at least 80% over the past 2 hours."
