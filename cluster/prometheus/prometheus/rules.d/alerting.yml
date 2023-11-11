@@ -39,3 +39,51 @@ groups:
         annotations:
           summary: "[Unavailable] [10+ mins] {{ $labels.lemmy_instance }}"
           description: "«{{ $labels.lemmy_instance }}» has been unavailable for more than «10» minutes."
+
+  - name: Low Availability
+    rules:
+      - alert: WARN - Availability
+        expr: lemmy_instance:availability:1h:percent < 70
+        for: 15m
+        labels:
+          severity: warning
+          lemmy_instance: "{{ $labels.lemmy_instance }}"
+          category: instance_availability
+        annotations:
+          summary: "[Availability < 70%] [15+ mins] {{ $labels.lemmy_instance }}"
+          description: "«{{ $labels.lemmy_instance }}» availability has been below 70% for more than 15 minutes."
+
+      - alert: ERROR - Low Availability
+        expr: lemmy_instance:availability:1h:percent < 70
+        for: 30m
+        labels:
+          severity: error
+          lemmy_instance: "{{ $labels.lemmy_instance }}"
+          category: instance_availability
+        annotations:
+          summary: "[Availability < 70%] [30+ mins] {{ $labels.lemmy_instance }}"
+          description: "«{{ $labels.lemmy_instance }}» availability has been below 70% for more than 30 minutes."
+
+  - name: High Latency
+    rules:
+      - alert: WARN - Latency
+        expr: lemmy_instance:relative_latency:1h:7d:percent > 30
+        for: 15m
+        labels:
+          severity: warning
+          lemmy_instance: "{{ $labels.lemmy_instance }}"
+          category: instance_latency
+        annotations:
+          summary: "[Latency spike > 30%] [15+ mins] {{ $labels.lemmy_instance }}"
+          description: "«{{ $labels.lemmy_instance }}» latency has been increasing by at least 30% for more than 15 minutes."
+
+      - alert: ERROR - Latency
+        expr: lemmy_instance:relative_latency:1h:7d:percent > 30
+        for: 15m
+        labels:
+          severity: error
+          lemmy_instance: "{{ $labels.lemmy_instance }}"
+          category: instance_latency
+        annotations:
+          summary: "[Latency spike > 30%] [30+ mins] {{ $labels.lemmy_instance }}"
+          description: "«{{ $labels.lemmy_instance }}» latency has been increasing by at least 30% for more than 30 minutes."
