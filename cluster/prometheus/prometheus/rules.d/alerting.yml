@@ -27,63 +27,41 @@ groups:
           category: instance_unavailable
         annotations:
           summary: "[Unavailable] [5+ mins] {{ $labels.lemmy_instance }}"
-          description: "«{{ $labels.lemmy_instance }}» has been unavailable for more than «5» minutes."
+          description: "«{{ $labels.lemmy_instance }}» has been unavailable for more than 5 minutes."
 
       - alert: ERROR - Instance Unavailable
         expr: lemmy_instance:failed:probe_success:count == 4
-        for: 10m
+        for: 15m
         labels:
           severity: error
           lemmy_instance: "{{ $labels.lemmy_instance }}"
           category: instance_unavailable
         annotations:
-          summary: "[Unavailable] [10+ mins] {{ $labels.lemmy_instance }}"
-          description: "«{{ $labels.lemmy_instance }}» has been unavailable for more than «10» minutes."
+          summary: "[Unavailable] [15+ mins] {{ $labels.lemmy_instance }}"
+          description: "«{{ $labels.lemmy_instance }}» has been unavailable for more than 15 minutes."
 
   - name: Low Availability
     rules:
       - alert: WARN - Availability
         expr: lemmy_instance:availability:1h:percent < 70
-        for: 15m
+        for: 1h
         labels:
           severity: warning
           lemmy_instance: "{{ $labels.lemmy_instance }}"
           category: instance_availability
         annotations:
-          summary: "[Availability < 70%] [15+ mins] {{ $labels.lemmy_instance }}"
-          description: "«{{ $labels.lemmy_instance }}» availability has been below 70% for more than 15 minutes."
-
-      - alert: ERROR - Low Availability
-        expr: lemmy_instance:availability:1h:percent < 70
-        for: 30m
-        labels:
-          severity: error
-          lemmy_instance: "{{ $labels.lemmy_instance }}"
-          category: instance_availability
-        annotations:
-          summary: "[Availability < 70%] [30+ mins] {{ $labels.lemmy_instance }}"
-          description: "«{{ $labels.lemmy_instance }}» availability has been below 70% for more than 30 minutes."
+          summary: "[Availability] [1+ hour] {{ $labels.lemmy_instance }} "
+          description: "«{{ $labels.lemmy_instance }}» availability has dropped below 70% for at leat the past 1 hour."
 
   - name: High Latency
     rules:
       - alert: WARN - Latency
         expr: lemmy_instance:relative_latency:1h:7d:percent > 80
-        for: 60m
+        for: 3h
         labels:
           severity: warning
           lemmy_instance: "{{ $labels.lemmy_instance }}"
           category: instance_latency
         annotations:
-          summary: "[Latency spike > 80%] [1+ hr] {{ $labels.lemmy_instance }}"
-          description: "«{{ $labels.lemmy_instance }}» latency has increased by at least 80% over the past 1 hour."
-
-      - alert: ERROR - Latency
-        expr: lemmy_instance:relative_latency:1h:7d:percent > 80
-        for: 120m
-        labels:
-          severity: error
-          lemmy_instance: "{{ $labels.lemmy_instance }}"
-          category: instance_latency
-        annotations:
-          summary: "[Latency spike > 80%] [2+ hrs] {{ $labels.lemmy_instance }}"
-          description: "«{{ $labels.lemmy_instance }}» latency has increased by at least 80% over the past 2 hours."
+          summary: "[Latency] [3+ hr] {{ $labels.lemmy_instance }} 80+% slower than its 7 day average."
+          description: "«{{ $labels.lemmy_instance }}» has been at least 80% slower than its past 7 day averge for more than 3 hours."
