@@ -31,7 +31,7 @@ services:
       - "prometheus-data:/prometheus"
     restart: always
   grafana:
-    image: "grafana/grafana:10.2.1"
+    image: "grafana/grafana:10.2.2"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.ini:/etc/grafana/grafana.ini"
     ports:
@@ -121,7 +121,7 @@ services:
       - GMAIL_USER=${SMTP_USER}
       - GMAIL_PASSWORD=${SMTP_PASSWORD}
   ntfy:
-    image: binwiederhier/ntfy:v2.7.0
+    image: binwiederhier/ntfy:v2.8.0
     entrypoint:
       - "/bin/sh"
       - "-c"
