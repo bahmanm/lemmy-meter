@@ -18,7 +18,7 @@
 version: "3.8"
 services:
   prometheus:
-    image: "prom/prometheus:v2.48.0"
+    image: "prom/prometheus:v2.49.1"
     command:
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=120d"
@@ -31,7 +31,7 @@ services:
       - "prometheus-data:/prometheus"
     restart: always
   grafana:
-    image: "grafana/grafana:10.2.2"
+    image: "grafana/grafana:10.3.1"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.ini:/etc/grafana/grafana.ini"
     ports:
