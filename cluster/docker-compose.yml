@@ -104,7 +104,7 @@ services:
       - "postgres-data:/var/lib/postgresql/data"
     restart: always
   alertmanager:
-    image: prom/alertmanager:v0.26.0
+    image: prom/alertmanager:v0.27.0
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--log.level=debug"
