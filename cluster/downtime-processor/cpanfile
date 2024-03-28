@@ -1,4 +1,4 @@
-requires 'perl', '5.39.8' ;
+requires 'perl', '5.39.9' ;
 
 requires 'Mojolicious',            '9.36' ;
 requires 'Net::Prometheus',        '0.12' ;
@@ -9,5 +9,5 @@ requires 'Moose',                  '2.2207' ;
 requires 'JSON',                   '4.10' ;
 requires 'JSON::Validator',        '5.14' ;
 requires 'File::Slurper',          '0.014' ;
-requires 'Data::UUID',             '1.226' ;
+requires 'Data::UUID',             '1.227' ;
 requires 'Log::Log4perl',          '1.57' ;
