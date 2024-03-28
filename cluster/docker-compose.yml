@@ -18,7 +18,7 @@
 version: "3.8"
 services:
   prometheus:
-    image: "prom/prometheus:v2.50.1"
+    image: "prom/prometheus:v2.51.1"
     command:
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=120d"
@@ -31,7 +31,7 @@ services:
       - "prometheus-data:/prometheus"
     restart: always
   grafana:
-    image: "grafana/grafana:10.4.0"
+    image: "grafana/grafana:10.4.1"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.ini:/etc/grafana/grafana.ini"
     ports:
@@ -121,7 +121,7 @@ services:
       - GMAIL_USER=${SMTP_USER}
       - GMAIL_PASSWORD=${SMTP_PASSWORD}
   ntfy:
-    image: binwiederhier/ntfy:v2.9.0
+    image: binwiederhier/ntfy:v2.10.0
     entrypoint:
       - "/bin/sh"
       - "-c"
