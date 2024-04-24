@@ -18,7 +18,7 @@
 version: "3.8"
 services:
   prometheus:
-    image: "prom/prometheus:v2.51.1"
+    image: "prom/prometheus:v2.51.2"
     command:
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=120d"
@@ -31,7 +31,7 @@ services:
       - "prometheus-data:/prometheus"
     restart: always
   grafana:
-    image: "grafana/grafana:10.4.1"
+    image: "grafana/grafana:10.4.2"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.ini:/etc/grafana/grafana.ini"
     ports:
@@ -41,7 +41,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   blackbox-exporter:
-    image: "prom/blackbox-exporter:v0.24.0"
+    image: "prom/blackbox-exporter:v0.25.0"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/blackbox-exporter/config.yml:/etc/blackbox_exporter/config.yml"
     ports:
@@ -86,7 +86,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   nginx:
-    image: nginx:1.25
+    image: nginx:1.26
     ports:
       - "8000:80"
       - "8001:8001"
