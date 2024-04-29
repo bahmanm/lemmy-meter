@@ -1,4 +1,4 @@
-requires 'perl', '5.39.9' ;
+requires 'perl', '5.39.10' ;
 
 requires 'Mojolicious',            '9.36' ;
 requires 'Net::Prometheus',        '0.12' ;
