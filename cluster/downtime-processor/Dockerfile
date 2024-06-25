@@ -1,4 +1,4 @@
-FROM perl:5.39.10
+FROM perl:5.40.0
 
 RUN apt-get update \
     && apt-get dist-upgrade -y \
