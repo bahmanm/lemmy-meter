@@ -1,7 +1,7 @@
-requires 'perl', '5.39.10' ;
+requires 'perl', '5.41.2' ;
 
-requires 'Mojolicious',            '9.36' ;
-requires 'Net::Prometheus',        '0.12' ;
+requires 'Mojolicious',            '9.37' ;
+requires 'Net::Prometheus',        '0.13' ;
 requires 'Data::Dump',             '1.25' ;
 requires 'Schedule::Cron::Events', '1.96' ;
 requires 'Text::CSV',              '2.04' ;
