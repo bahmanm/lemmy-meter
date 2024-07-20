@@ -19,3 +19,6 @@
     probe: http_page_2xx
   targets:
     - lemmy.basedcount.com
+    - lemmy.wtf
+    - lemmy.wtf
+    - lemmy.wtf
