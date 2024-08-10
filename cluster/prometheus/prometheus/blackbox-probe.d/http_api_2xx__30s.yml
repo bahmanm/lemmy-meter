@@ -18,6 +18,7 @@
 - labels:
     probe: http_api_2xx
   targets:
+    - leminal.space
     - lemmy.basedcount.com
     - lemmy.wtf
     - lemmy.wtf
