@@ -18,7 +18,7 @@
 version: "3.8"
 services:
   prometheus:
-    image: "prom/prometheus:v2.54.0"
+    image: "prom/prometheus:v2.55.1"
     command:
       - "--storage.tsdb.path=/prometheus"
       - "--storage.tsdb.retention.time=120d"
@@ -31,7 +31,7 @@ services:
       - "prometheus-data:/prometheus"
     restart: always
   grafana:
-    image: "grafana/grafana:10.4.6"
+    image: "grafana/grafana:10.4.19"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/grafana/grafana.ini:/etc/grafana/grafana.ini"
     ports:
@@ -41,7 +41,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   blackbox-exporter:
-    image: "prom/blackbox-exporter:v0.25.0"
+    image: "prom/blackbox-exporter:v0.26.0"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/blackbox-exporter/config.yml:/etc/blackbox_exporter/config.yml"
     ports:
@@ -49,7 +49,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   json-exporter:
-    image: "prometheuscommunity/json-exporter:v0.6.0"
+    image: "prometheuscommunity/json-exporter:v0.7.0"
     volumes:
       - "${CLUSTER_DEPLOY_ROOT}/json-exporter/config.yml:/etc/json_exporter-config.yml"
     command:
@@ -86,7 +86,7 @@ services:
     user: "${UID}:${GID}"
     restart: always
   nginx:
-    image: nginx:1.27
+    image: nginx:1.28
     ports:
       - "8000:80"
       - "8001:8001"
@@ -95,7 +95,7 @@ services:
       - "${CLUSTER_DEPLOY_ROOT}/nginx/conf.d/grafana.conf:/etc/nginx/conf.d/grafana.conf"
     restart: always
   postgres:
-    image: postgres:16.4
+    image: postgres:16.9
     ports:
       - "5432:5432"
     environment:
@@ -104,7 +104,7 @@ services:
       - "postgres-data:/var/lib/postgresql/data"
     restart: always
   alertmanager:
-    image: prom/alertmanager:v0.27.0
+    image: prom/alertmanager:v0.28.1
     command:
       - "--config.file=/etc/alertmanager/alertmanager.yml"
       - "--log.level=debug"
@@ -114,7 +114,7 @@ services:
       - "${CLUSTER_DEPLOY_ROOT}/alertmanager:/etc/alertmanager"
     restart: always
   smtp:
-    image: ixdotai/smtp:v0.5.2
+    image: ixdotai/smtp:v0.7.7
     ports:
       - "2525:25"
     environment:
